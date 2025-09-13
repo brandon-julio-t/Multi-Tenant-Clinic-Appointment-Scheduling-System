@@ -1,22 +1,24 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   addMinutes,
   areIntervalsOverlapping,
-  endOfToday,
+  endOfDay,
   format,
   isBefore,
-  isWithinInterval,
   set,
-  setHours,
+  startOfDay,
   startOfToday,
 } from "date-fns";
 import { CalendarIcon, Loader2Icon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { cn } from "~/lib/utils";
+import type { TRPCClientError } from "@trpc/react-query";
+import { useRouter } from "next/navigation";
+import React from "react";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
 import {
@@ -48,13 +50,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { api } from "~/trpc/react";
-import React from "react";
-import { toast } from "sonner";
-import type { TRPCClientError } from "@trpc/react-query";
+import { cn } from "~/lib/utils";
 import type { AppRouter } from "~/server/api/root";
+import { api } from "~/trpc/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { useRouter } from "next/navigation";
 
 const appointmentSchema = z.object({
   doctorId: z.string().min(1, "Please select a doctor"),
@@ -106,13 +105,14 @@ export function AppointmentForm() {
   });
 
   const roomId = form.watch("roomId");
+  const date = form.watch("appointmentDate");
 
   const { data: bookedAppointments = [] } =
     api.appointment.getAppointments.useQuery(
       {
         roomId,
-        from: startOfToday(),
-        to: endOfToday(),
+        from: startOfDay(date),
+        to: endOfDay(date),
       },
       { enabled: !!roomId },
     );
