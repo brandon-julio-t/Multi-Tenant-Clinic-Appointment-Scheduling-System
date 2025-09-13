@@ -3,8 +3,8 @@ import { afterEach, expect, it } from "bun:test";
 import { db } from "~/server/db";
 import { createAppointment } from "./create-appointment";
 
-const startAt = new Date("9999-12-31T09:00:00Z");
-const endAt = new Date("9999-12-31T09:30:00Z");
+const startAt = new Date("0001-01-01T09:00:00Z");
+const endAt = new Date("0001-01-01T09:30:00Z");
 
 async function setupSuccessfulInput() {
   const [organizationId, doctorId, serviceId, roomId, patientId, deviceIds] =
