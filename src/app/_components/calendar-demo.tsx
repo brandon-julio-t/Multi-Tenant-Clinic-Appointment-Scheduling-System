@@ -1,6 +1,7 @@
 "use client";
 
 import { faker } from "@faker-js/faker";
+import { endOfMonth, format, set, startOfMonth } from "date-fns";
 import {
   CalendarBody,
   CalendarDate,
@@ -11,7 +12,11 @@ import {
   CalendarMonthPicker,
   CalendarProvider,
   CalendarYearPicker,
+  useCalendarMonth,
+  useCalendarYear,
+  type Feature,
 } from "~/components/ui/kibo-ui/calendar";
+import { api } from "~/trpc/react";
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -43,18 +48,47 @@ const latestYear =
     .sort()
     .at(-1) ?? new Date().getFullYear();
 
-export const CalendarDemo = () => (
-  <CalendarProvider>
-    <CalendarDate>
-      <CalendarDatePicker>
-        <CalendarMonthPicker />
-        <CalendarYearPicker end={latestYear} start={earliestYear} />
-      </CalendarDatePicker>
-      <CalendarDatePagination />
-    </CalendarDate>
-    <CalendarHeader />
-    <CalendarBody features={exampleFeatures}>
-      {({ feature }) => <CalendarItem feature={feature} key={feature.id} />}
-    </CalendarBody>
-  </CalendarProvider>
-);
+export const CalendarDemo = () => {
+  const [month] = useCalendarMonth();
+  const [year] = useCalendarYear();
+
+  const anchorDate = set(new Date(), { month, year });
+
+  const appointmentsQuery = api.appointment.getAppointments.useQuery({
+    from: startOfMonth(anchorDate),
+    to: endOfMonth(anchorDate),
+  });
+
+  const appointmentsAsCalendarFeatures =
+    appointmentsQuery.data?.map((appointment) => {
+      return {
+        id: appointment.id,
+        name: `${appointment.room.name}: ${appointment.doctor.name} - ${appointment.service.name} (${format(appointment.startAt, "HH:mm")} - ${format(appointment.endAt, "HH:mm")})`,
+        startAt: appointment.startAt,
+        endAt: appointment.endAt,
+        status: {
+          id: appointment.id,
+          name: appointment.room.name,
+          color: "#6B7280",
+        },
+      } as Feature;
+    }) ?? [];
+
+  return (
+    <>
+      <CalendarProvider>
+        <CalendarDate>
+          <CalendarDatePicker>
+            <CalendarMonthPicker />
+            <CalendarYearPicker end={latestYear} start={earliestYear} />
+          </CalendarDatePicker>
+          <CalendarDatePagination />
+        </CalendarDate>
+        <CalendarHeader />
+        <CalendarBody features={appointmentsAsCalendarFeatures}>
+          {({ feature }) => <CalendarItem feature={feature} key={feature.id} />}
+        </CalendarBody>
+      </CalendarProvider>
+    </>
+  );
+};

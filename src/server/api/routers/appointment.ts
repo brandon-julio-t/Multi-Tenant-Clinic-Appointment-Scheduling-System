@@ -124,6 +124,11 @@ export const appointmentRouter = createTRPCRouter({
         where: {
           AND: whereAnd,
         },
+        include: {
+          doctor: true,
+          service: true,
+          room: true,
+        },
       });
     }),
 
