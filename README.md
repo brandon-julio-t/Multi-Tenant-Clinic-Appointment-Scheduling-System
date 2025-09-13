@@ -1,4 +1,4 @@
-# Noscai Medical Appointment System
+# Multi Tenant Clinic Appointment System
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app` for a medical appointment management system.
 
@@ -26,7 +26,7 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 
    ```bash
    git clone <repository-url>
-   cd noscai-test
+   cd multi-tenant-clinic-appointment-system
    ```
 
 2. **Install dependencies**
@@ -46,7 +46,7 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
    Update the `.env` file with your database URL and auth secrets:
 
    ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/noscai_db"
+   DATABASE_URL="postgresql://postgres:password@localhost:5433/test"
    BETTER_AUTH_SECRET="your-secret-key-here"
    NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
    ```

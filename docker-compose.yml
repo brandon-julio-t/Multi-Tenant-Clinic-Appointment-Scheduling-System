@@ -1,12 +1,12 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: noscai-postgres
+    container_name: test-postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: noscai
+      POSTGRES_DB: test
     ports:
       - "5433:5432"
     volumes:
