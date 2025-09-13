@@ -1,6 +1,8 @@
 "use client";
 
+import type { inferRouterOutputs } from "@trpc/server";
 import {
+  areIntervalsOverlapping,
   endOfDay,
   endOfMonth,
   format,
@@ -40,8 +42,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
-import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
+import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
 
 const earliestYear = 1970;
@@ -59,8 +61,10 @@ export const AppointmentsCalendar = () => {
     to: endOfMonth(anchorDate),
   });
 
+  const appointments = appointmentsQuery.data ?? [];
+
   const appointmentsAsCalendarFeatures =
-    appointmentsQuery.data?.map((appointment) => {
+    appointments.map((appointment) => {
       return {
         id: appointment.id,
         name: `${appointment.room.name}: ${appointment.doctor.name} - ${appointment.service.name} (${format(appointment.startAt, "HH:mm")} - ${format(appointment.endAt, "HH:mm")})`,
@@ -106,12 +110,21 @@ export const AppointmentsCalendar = () => {
                       size="sm"
                       variant="outline"
                       className="w-full text-xs"
+                      disabled={
+                        appointments.length <= 0 || appointmentsQuery.isLoading
+                      }
                     >
+                      {appointmentsQuery.isLoading && (
+                        <Loader2Icon className="animate-spin" />
+                      )}
                       View More
                     </Button>
                   </SheetTrigger>
                   <SheetContent className="h-svh">
-                    <AppointmentsByDaySheetContent date={feature.startAt} />
+                    <AppointmentsByDaySheetContent
+                      date={feature.startAt}
+                      appointments={appointments}
+                    />
                   </SheetContent>
                 </Sheet>
               </div>
@@ -123,14 +136,24 @@ export const AppointmentsCalendar = () => {
   );
 };
 
-function AppointmentsByDaySheetContent({ date }: { date: Date }) {
-  const from = startOfDay(date);
-  const to = endOfDay(date);
+function AppointmentsByDaySheetContent({
+  date,
+  appointments,
+}: {
+  date: Date;
+  appointments: inferRouterOutputs<AppRouter>["appointment"]["getAppointments"];
+}) {
+  const appointmentsForDay = React.useMemo(() => {
+    const from = startOfDay(date);
+    const to = endOfDay(date);
 
-  const appointmentsQuery = api.appointment.getAppointments.useQuery({
-    from,
-    to,
-  });
+    return appointments.filter((appointment) => {
+      return areIntervalsOverlapping(
+        { start: appointment.startAt, end: appointment.endAt },
+        { start: from, end: to },
+      );
+    });
+  }, [appointments, date]);
 
   return (
     <>
@@ -145,32 +168,33 @@ function AppointmentsByDaySheetContent({ date }: { date: Date }) {
 
       <section className="flex-1 overflow-y-auto px-4">
         <div className="flex flex-col gap-4 pb-6">
-          {appointmentsQuery.isLoading &&
-            Array.from({ length: 10 }).map((_, index) => (
-              <Skeleton key={index} className="h-42.5 w-full" />
-            ))}
-
-          {appointmentsQuery.data?.map((appointment) => (
-            <Card key={appointment.id}>
-              <CardHeader>
-                <CardTitle className="truncate">
-                  Room: {appointment.room.name}
-                </CardTitle>
-                <CardDescription className="truncate">
-                  Doctor: {appointment.doctor.name}
-                </CardDescription>
-                <CardDescription className="truncate">
-                  Service: {appointment.service.name}
-                </CardDescription>
-                <CardDescription className="truncate">
-                  Start Time: {format(appointment.startAt, "pppp")}
-                </CardDescription>
-                <CardDescription className="truncate">
-                  End Time: {format(appointment.endAt, "pppp")}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
+          {appointmentsForDay.length <= 0 ? (
+            <p className="text-muted-foreground text-center text-sm">
+              No appointments for this day
+            </p>
+          ) : (
+            appointmentsForDay.map((appointment) => (
+              <Card key={appointment.id}>
+                <CardHeader>
+                  <CardTitle className="truncate">
+                    Room: {appointment.room.name}
+                  </CardTitle>
+                  <CardDescription className="truncate">
+                    Doctor: {appointment.doctor.name}
+                  </CardDescription>
+                  <CardDescription className="truncate">
+                    Service: {appointment.service.name}
+                  </CardDescription>
+                  <CardDescription className="truncate">
+                    Start Time: {format(appointment.startAt, "pppp")}
+                  </CardDescription>
+                  <CardDescription className="truncate">
+                    End Time: {format(appointment.endAt, "pppp")}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            ))
+          )}
         </div>
       </section>
     </>
