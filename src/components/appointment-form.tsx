@@ -186,7 +186,9 @@ export function AppointmentForm() {
 
       while (isBefore(curr, end)) {
         const start = curr;
-        const end = addMinutes(curr, serviceDurationMinutes, { in: tz(timezone) });
+        const end = addMinutes(curr, serviceDurationMinutes, {
+          in: tz(timezone),
+        });
 
         const isPastTime = isBefore(start, constructNow(currentTime));
         const isBooked = isTimeSlotBooked(start, end);
