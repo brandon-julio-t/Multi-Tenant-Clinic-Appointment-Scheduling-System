@@ -6,6 +6,8 @@ model Doctor {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now()) @updatedAt
   appointments   Appointment[]
+
+  @@index([organizationId])
 }
 
 model Service {
@@ -16,6 +18,8 @@ model Service {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now()) @updatedAt
   appointments   Appointment[]
+
+  @@index([organizationId])
 }
 
 model Room {
@@ -26,6 +30,8 @@ model Room {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now()) @updatedAt
   appointments   Appointment[]
+
+  @@index([organizationId])
 }
 
 model Device {
@@ -36,6 +42,8 @@ model Device {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
   appointmentDevices AppointmentDevice[]
+
+  @@index([organizationId])
 }
 
 model Patient {
@@ -46,6 +54,8 @@ model Patient {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now()) @updatedAt
   appointments   Appointment[]
+
+  @@index([organizationId])
 }
 
 model Appointment {
@@ -65,6 +75,9 @@ model Appointment {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
   appointmentDevices AppointmentDevice[]
+
+  @@index([startAt, endAt])
+  @@index([roomId, startAt, endAt])
 }
 
 model AppointmentDevice {
@@ -75,4 +88,6 @@ model AppointmentDevice {
   device        Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @default(now()) @updatedAt
+
+  @@index([appointmentId])
 }
