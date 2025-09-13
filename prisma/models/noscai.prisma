@@ -9,12 +9,13 @@ model Doctor {
 }
 
 model Service {
-  id             String       @id @default(ulid())
+  id             String        @id @default(ulid())
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now()) @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+  appointments   Appointment[]
 }
 
 model Room {
@@ -57,6 +58,8 @@ model Appointment {
   patient            Patient             @relation(fields: [patientId], references: [id], onDelete: Cascade)
   roomId             String
   room               Room                @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  serviceId          String
+  service            Service             @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   startAt            DateTime
   endAt              DateTime
   createdAt          DateTime            @default(now())
