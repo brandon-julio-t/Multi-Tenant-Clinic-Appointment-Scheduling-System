@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -98,7 +99,7 @@ export const appointmentRouter = createTRPCRouter({
   getAppointments: publicProcedure
     .input(
       z.object({
-        roomId: z.string(),
+        roomId: z.string().nullish(),
         from: z.instanceof(Date),
         to: z.instanceof(Date),
       }),
@@ -106,11 +107,22 @@ export const appointmentRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       console.log("input", input);
 
-      return ctx.db.appointment.findMany({
-        where: {
-          roomId: input.roomId,
+      const whereAnd: Prisma.AppointmentWhereInput[] = [
+        {
           startAt: { gte: input.from },
           endAt: { lte: input.to },
+        },
+      ];
+
+      if (input.roomId) {
+        whereAnd.push({ roomId: input.roomId });
+      }
+
+      console.log("whereAnd", whereAnd);
+
+      return ctx.db.appointment.findMany({
+        where: {
+          AND: whereAnd,
         },
       });
     }),
