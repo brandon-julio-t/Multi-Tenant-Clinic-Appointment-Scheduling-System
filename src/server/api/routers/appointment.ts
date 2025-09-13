@@ -7,6 +7,8 @@ import {
   createAppointmentInputSchema,
 } from "./logics/create-appointment";
 
+// TODO: organizationId should come from user auth, but for now we use a fixed value
+
 export const appointmentRouter = createTRPCRouter({
   // Fetch all doctors
   getDoctors: publicProcedure
