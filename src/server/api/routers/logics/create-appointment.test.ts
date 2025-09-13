@@ -1,7 +1,10 @@
-import { expect, it } from "bun:test";
+import { TRPCError } from "@trpc/server";
+import { afterEach, expect, it } from "bun:test";
 import { db } from "~/server/db";
 import { createAppointment } from "./create-appointment";
-import { TRPCError } from "@trpc/server";
+
+const startAt = new Date("9999-12-31T09:00:00Z");
+const endAt = new Date("9999-12-31T09:30:00Z");
 
 async function setupSuccessfulInput() {
   const [organizationId, doctorId, serviceId, roomId, patientId, deviceIds] =
@@ -16,9 +19,6 @@ async function setupSuccessfulInput() {
         .then((devices) => devices.map((device) => device.id)),
     ]);
 
-  const startAt = new Date("9999-12-31T09:00:00Z");
-  const endAt = new Date("9999-12-31T09:30:00Z");
-
   return {
     organizationId,
     doctorId,
@@ -30,6 +30,15 @@ async function setupSuccessfulInput() {
     endAt,
   };
 }
+
+afterEach(async () => {
+  await db.appointment.deleteMany({
+    where: {
+      startAt: { gte: startAt },
+      endAt: { lte: endAt },
+    },
+  });
+});
 
 it("should create appointment successfully", async () => {
   const input = await setupSuccessfulInput();
@@ -44,12 +53,6 @@ it("should create appointment successfully", async () => {
       startAt: { gte: input.startAt },
       endAt: { lte: input.endAt },
       roomId: input.roomId,
-    },
-  });
-
-  await db.appointment.delete({
-    where: {
-      id: appointment.id,
     },
   });
 
@@ -111,12 +114,6 @@ it("should throw an error if the room is already booked for the same time", asyn
     },
   });
 
-  await db.appointment.delete({
-    where: {
-      id: appointment1.id,
-    },
-  });
-
   expect(createdAppointmentsCount).toBe(1);
 });
 
@@ -141,17 +138,6 @@ it("should withstand thundering herd of create appointment requests into the sam
       roomId: input.roomId,
     },
   });
-
-  const createdAppointment = appointments.find(
-    (x) => x.status === "fulfilled",
-  )?.value;
-  if (createdAppointment) {
-    await db.appointment.delete({
-      where: {
-        id: createdAppointment.id,
-      },
-    });
-  }
 
   const success = appointments.filter((x) => x.status === "fulfilled").length;
   const failed = appointments.filter((x) => x.status === "rejected").length;
