@@ -2,6 +2,7 @@
 
 import { faker } from "@faker-js/faker";
 import { endOfMonth, format, set, startOfMonth } from "date-fns";
+import { Loader2Icon } from "lucide-react";
 import {
   CalendarBody,
   CalendarDate,
@@ -16,39 +17,14 @@ import {
   useCalendarYear,
   type Feature,
 } from "~/components/ui/kibo-ui/calendar";
+import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+const earliestYear = 1970;
 
-const statuses = [
-  { id: faker.string.uuid(), name: "Planned", color: "#6B7280" },
-  { id: faker.string.uuid(), name: "In Progress", color: "#F59E0B" },
-  { id: faker.string.uuid(), name: "Done", color: "#10B981" },
-];
+const latestYear = 3000;
 
-const exampleFeatures = Array.from({ length: 20 })
-  .fill(null)
-  .map(() => ({
-    id: faker.string.uuid(),
-    name: capitalize(faker.company.buzzPhrase()),
-    startAt: faker.date.past({ years: 0.5, refDate: new Date() }),
-    endAt: faker.date.future({ years: 0.5, refDate: new Date() }),
-    status: faker.helpers.arrayElement(statuses),
-  }));
-
-const earliestYear =
-  exampleFeatures
-    .map((feature) => feature.startAt.getFullYear())
-    .sort()
-    .at(0) ?? new Date().getFullYear();
-
-const latestYear =
-  exampleFeatures
-    .map((feature) => feature.endAt.getFullYear())
-    .sort()
-    .at(-1) ?? new Date().getFullYear();
-
-export const CalendarDemo = () => {
+export const AppointmentsCalendar = () => {
   const [month] = useCalendarMonth();
   const [year] = useCalendarYear();
 
@@ -76,7 +52,16 @@ export const CalendarDemo = () => {
 
   return (
     <>
-      <CalendarProvider>
+      <CalendarProvider
+        className={cn(
+          "relative",
+          appointmentsQuery.isLoading && "animate-pulse",
+        )}
+      >
+        {appointmentsQuery.isLoading && (
+          <Loader2Icon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin" />
+        )}
+
         <CalendarDate>
           <CalendarDatePicker>
             <CalendarMonthPicker />

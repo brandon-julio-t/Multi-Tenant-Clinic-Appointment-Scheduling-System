@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDemo } from "./_components/calendar-demo";
+import { AppointmentsCalendar } from "./_components/appointments-calendar";
 import { Button } from "~/components/ui/button";
 
 const HomePage = () => {
@@ -16,7 +16,7 @@ const HomePage = () => {
           </Button>
         </section>
 
-        <CalendarDemo />
+        <AppointmentsCalendar />
       </div>
     </main>
   );
