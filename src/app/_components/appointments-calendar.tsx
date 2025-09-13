@@ -1,5 +1,6 @@
 "use client";
 
+import { tz } from "@date-fns/tz";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
   areIntervalsOverlapping,
@@ -42,6 +43,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
+import { useAppTimezone } from "~/hooks/use-timezone";
 import { cn } from "~/lib/utils";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
@@ -54,20 +56,27 @@ export const AppointmentsCalendar = () => {
   const [month] = useCalendarMonth();
   const [year] = useCalendarYear();
 
-  const anchorDate = set(new Date(), { month, year });
+  const { timezone } = useAppTimezone();
+
+  const anchorDate = set(new Date(), { month, year }, { in: tz(timezone) });
 
   const appointmentsQuery = api.appointment.getAppointments.useQuery({
-    from: startOfMonth(anchorDate),
-    to: endOfMonth(anchorDate),
+    from: startOfMonth(anchorDate, { in: tz(timezone) }),
+    to: endOfMonth(anchorDate, { in: tz(timezone) }),
   });
 
   const appointments = appointmentsQuery.data ?? [];
 
   const appointmentsAsCalendarFeatures =
     appointments.map((appointment) => {
+      const startTime = format(appointment.startAt, "HH:mm", {
+        in: tz(timezone),
+      });
+      const endTime = format(appointment.endAt, "HH:mm", { in: tz(timezone) });
+
       return {
         id: appointment.id,
-        name: `${appointment.room.name}: ${appointment.doctor.name} - ${appointment.service.name} (${format(appointment.startAt, "HH:mm")} - ${format(appointment.endAt, "HH:mm")})`,
+        name: `${appointment.room.name}: ${appointment.doctor.name} - ${appointment.service.name} (${startTime} - ${endTime})`,
         startAt: appointment.startAt,
         endAt: appointment.endAt,
         status: {
@@ -143,9 +152,11 @@ function AppointmentsByDaySheetContent({
   date: Date;
   appointments: inferRouterOutputs<AppRouter>["appointment"]["getAppointments"];
 }) {
+  const { timezone } = useAppTimezone();
+
   const appointmentsForDay = React.useMemo(() => {
-    const from = startOfDay(date);
-    const to = endOfDay(date);
+    const from = startOfDay(date, { in: tz(timezone) });
+    const to = endOfDay(date, { in: tz(timezone) });
 
     return appointments.filter((appointment) => {
       return areIntervalsOverlapping(
@@ -153,14 +164,14 @@ function AppointmentsByDaySheetContent({
         { start: from, end: to },
       );
     });
-  }, [appointments, date]);
+  }, [appointments, date, timezone]);
 
   return (
     <>
       <SheetHeader>
         <SheetTitle>Appointments</SheetTitle>
         <SheetDescription>
-          Appointments for the day ({format(date, "PPP")})
+          Appointments for the day ({format(date, "PPP", { in: tz(timezone) })})
         </SheetDescription>
       </SheetHeader>
 
@@ -186,10 +197,14 @@ function AppointmentsByDaySheetContent({
                     Service: {appointment.service.name}
                   </CardDescription>
                   <CardDescription className="truncate">
-                    Start Time: {format(appointment.startAt, "pppp")}
+                    Start Time:{" "}
+                    {format(appointment.startAt, "pppp", {
+                      in: tz(timezone),
+                    })}
                   </CardDescription>
                   <CardDescription className="truncate">
-                    End Time: {format(appointment.endAt, "pppp")}
+                    End Time:{" "}
+                    {format(appointment.endAt, "pppp", { in: tz(timezone) })}
                   </CardDescription>
                 </CardHeader>
               </Card>

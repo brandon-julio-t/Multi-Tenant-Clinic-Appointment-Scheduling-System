@@ -1,9 +1,11 @@
 "use client";
 
+import { tz } from "@date-fns/tz";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   addMinutes,
   areIntervalsOverlapping,
+  constructNow,
   endOfDay,
   format,
   isBefore,
@@ -50,6 +52,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { useAppTimezone, useGlobalTime } from "~/hooks/use-timezone";
 import { cn } from "~/lib/utils";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
@@ -71,6 +74,9 @@ type AppointmentFormData = z.infer<typeof appointmentSchema>;
 export function AppointmentForm() {
   // TODO: Get organizationId from user auth
   const organizationId = "org_medical_center";
+
+  const { timezone } = useAppTimezone();
+  const { localTime, appTime } = useGlobalTime();
 
   // Fetch data using tRPC
   const { data: doctors = [] } = api.appointment.getDoctors.useQuery({
@@ -111,13 +117,11 @@ export function AppointmentForm() {
     api.appointment.getAppointments.useQuery(
       {
         roomId,
-        from: startOfDay(date),
-        to: endOfDay(date),
+        from: startOfDay(date, { in: tz(timezone) }),
+        to: endOfDay(date, { in: tz(timezone) }),
       },
       { enabled: !!roomId },
     );
-
-  console.log("bookedAppointments", bookedAppointments);
 
   const isTimeSlotBooked = React.useCallback(
     (start: Date, end: Date) => {
@@ -145,7 +149,7 @@ export function AppointmentForm() {
 
   const availableTimeSlots = React.useMemo(() => {
     const currentTime = new Date();
-    const now = startOfToday();
+    const now = startOfToday({ in: tz(timezone) });
 
     const timeSlots: Array<{
       start: Date;
@@ -158,25 +162,33 @@ export function AppointmentForm() {
       const [startHour, startMinute] = workingHour.startHour.split(":");
       const [endHour, endMinute] = workingHour.endHour.split(":");
 
-      const end = set(now, {
-        hours: parseInt(endHour ?? "00"),
-        minutes: parseInt(endMinute ?? "00"),
-        seconds: 0,
-        milliseconds: 0,
-      });
+      const end = set(
+        now,
+        {
+          hours: parseInt(endHour ?? "00"),
+          minutes: parseInt(endMinute ?? "00"),
+          seconds: 0,
+          milliseconds: 0,
+        },
+        { in: tz(timezone) },
+      );
 
-      let curr = set(now, {
-        hours: parseInt(startHour ?? "00"),
-        minutes: parseInt(startMinute ?? "00"),
-        seconds: 0,
-        milliseconds: 0,
-      });
+      let curr = set(
+        now,
+        {
+          hours: parseInt(startHour ?? "00"),
+          minutes: parseInt(startMinute ?? "00"),
+          seconds: 0,
+          milliseconds: 0,
+        },
+        { in: tz(timezone) },
+      );
 
       while (isBefore(curr, end)) {
         const start = curr;
-        const end = addMinutes(curr, serviceDurationMinutes);
+        const end = addMinutes(curr, serviceDurationMinutes, { in: tz(timezone) });
 
-        const isPastTime = isBefore(start, currentTime);
+        const isPastTime = isBefore(start, constructNow(currentTime));
         const isBooked = isTimeSlotBooked(start, end);
 
         const disabledReason = isPastTime
@@ -191,12 +203,12 @@ export function AppointmentForm() {
           disabled: isPastTime || isBooked,
           disabledReason,
         });
-        curr = addMinutes(curr, serviceDurationMinutes);
+        curr = addMinutes(curr, serviceDurationMinutes, { in: tz(timezone) });
       }
     }
 
     return timeSlots;
-  }, [doctorWorkingHours, isTimeSlotBooked]);
+  }, [doctorWorkingHours, isTimeSlotBooked, timezone]);
 
   const startTime = form.watch("startTime");
   const endTime = form.watch("endTime");
@@ -212,19 +224,27 @@ export function AppointmentForm() {
     const [startHour, startMinute] = data.startTime.split(":");
     const [endHour, endMinute] = data.endTime.split(":");
 
-    const startAt = set(data.appointmentDate, {
-      hours: parseInt(startHour ?? "00"),
-      minutes: parseInt(startMinute ?? "00"),
-      seconds: 0,
-      milliseconds: 0,
-    });
+    const startAt = set(
+      data.appointmentDate,
+      {
+        hours: parseInt(startHour ?? "00"),
+        minutes: parseInt(startMinute ?? "00"),
+        seconds: 0,
+        milliseconds: 0,
+      },
+      { in: tz(timezone) },
+    );
 
-    const endAt = set(data.appointmentDate, {
-      hours: parseInt(endHour ?? "00"),
-      minutes: parseInt(endMinute ?? "00"),
-      seconds: 0,
-      milliseconds: 0,
-    });
+    const endAt = set(
+      data.appointmentDate,
+      {
+        hours: parseInt(endHour ?? "00"),
+        minutes: parseInt(endMinute ?? "00"),
+        seconds: 0,
+        milliseconds: 0,
+      },
+      { in: tz(timezone) },
+    );
 
     await toast
       .promise(
@@ -391,7 +411,7 @@ export function AppointmentForm() {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { in: tz(timezone) })
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -481,10 +501,18 @@ export function AppointmentForm() {
                     Click on a time slot to set the appointment time
                   </FormDescription>
 
+                  <FormDescription>Local Time: {localTime}</FormDescription>
+
+                  <FormDescription>App Time: {appTime}</FormDescription>
+
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                     {availableTimeSlots.map((slot, index) => {
-                      const startTimeStr = format(slot.start, "HH:mm");
-                      const endTimeStr = format(slot.end, "HH:mm");
+                      const startTimeStr = format(slot.start, "HH:mm", {
+                        in: tz(timezone),
+                      });
+                      const endTimeStr = format(slot.end, "HH:mm", {
+                        in: tz(timezone),
+                      });
 
                       const isSelected =
                         startTimeStr === startTime && endTimeStr === endTime;
