@@ -1,8 +1,22 @@
 "use client";
 
-import { faker } from "@faker-js/faker";
-import { endOfMonth, format, set, startOfMonth } from "date-fns";
+import {
+  endOfDay,
+  endOfMonth,
+  format,
+  set,
+  startOfDay,
+  startOfMonth,
+} from "date-fns";
 import { Loader2Icon } from "lucide-react";
+import React from "react";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import {
   CalendarBody,
   CalendarDate,
@@ -17,6 +31,16 @@ import {
   useCalendarYear,
   type Feature,
 } from "~/components/ui/kibo-ui/calendar";
+import { Separator } from "~/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet";
+import { Skeleton } from "~/components/ui/skeleton";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
 
@@ -71,9 +95,84 @@ export const AppointmentsCalendar = () => {
         </CalendarDate>
         <CalendarHeader />
         <CalendarBody features={appointmentsAsCalendarFeatures}>
-          {({ feature }) => <CalendarItem feature={feature} key={feature.id} />}
+          {({ feature }) => (
+            <React.Fragment key={feature.id}>
+              <CalendarItem feature={feature} />
+
+              <div className="absolute right-0 bottom-0 left-0 hidden p-2 last:block">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full text-xs"
+                    >
+                      View More
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="h-svh">
+                    <AppointmentsByDaySheetContent date={feature.startAt} />
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </React.Fragment>
+          )}
         </CalendarBody>
       </CalendarProvider>
     </>
   );
 };
+
+function AppointmentsByDaySheetContent({ date }: { date: Date }) {
+  const from = startOfDay(date);
+  const to = endOfDay(date);
+
+  const appointmentsQuery = api.appointment.getAppointments.useQuery({
+    from,
+    to,
+  });
+
+  return (
+    <>
+      <SheetHeader>
+        <SheetTitle>Appointments</SheetTitle>
+        <SheetDescription>
+          Appointments for the day ({format(date, "PPP")})
+        </SheetDescription>
+      </SheetHeader>
+
+      <Separator />
+
+      <section className="flex-1 overflow-y-auto px-4">
+        <div className="flex flex-col gap-4 pb-6">
+          {appointmentsQuery.isLoading &&
+            Array.from({ length: 10 }).map((_, index) => (
+              <Skeleton key={index} className="h-42.5 w-full" />
+            ))}
+
+          {appointmentsQuery.data?.map((appointment) => (
+            <Card key={appointment.id}>
+              <CardHeader>
+                <CardTitle className="truncate">
+                  Room: {appointment.room.name}
+                </CardTitle>
+                <CardDescription className="truncate">
+                  Doctor: {appointment.doctor.name}
+                </CardDescription>
+                <CardDescription className="truncate">
+                  Service: {appointment.service.name}
+                </CardDescription>
+                <CardDescription className="truncate">
+                  Start Time: {format(appointment.startAt, "pppp")}
+                </CardDescription>
+                <CardDescription className="truncate">
+                  End Time: {format(appointment.endAt, "pppp")}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
