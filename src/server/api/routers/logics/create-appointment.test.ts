@@ -16,8 +16,8 @@ async function setupSuccessfulInput() {
         .then((devices) => devices.map((device) => device.id)),
     ]);
 
-  const startAt = new Date("2025-09-13T09:00:00Z");
-  const endAt = new Date("2025-09-13T09:30:00Z");
+  const startAt = new Date("9999-12-31T09:00:00Z");
+  const endAt = new Date("9999-12-31T09:30:00Z");
 
   return {
     organizationId,
@@ -37,6 +37,14 @@ it("should create appointment successfully", async () => {
   const appointment = await createAppointment({
     prisma: db,
     input: input,
+  });
+
+  const createdAppointmentsCount = await db.appointment.count({
+    where: {
+      startAt: { gte: input.startAt },
+      endAt: { lte: input.endAt },
+      roomId: input.roomId,
+    },
   });
 
   await db.appointment.delete({
@@ -62,6 +70,8 @@ it("should create appointment successfully", async () => {
     startAt: input.startAt,
     endAt: input.endAt,
   });
+
+  expect(createdAppointmentsCount).toBe(1);
 });
 
 it("should throw an error if the room is already booked for the same time", async () => {
@@ -93,11 +103,21 @@ it("should throw an error if the room is already booked for the same time", asyn
     expect(trpcError.message).toBe("Room is already booked for this time");
   }
 
+  const createdAppointmentsCount = await db.appointment.count({
+    where: {
+      startAt: { gte: input.startAt },
+      endAt: { lte: input.endAt },
+      roomId: input.roomId,
+    },
+  });
+
   await db.appointment.delete({
     where: {
       id: appointment1.id,
     },
   });
+
+  expect(createdAppointmentsCount).toBe(1);
 });
 
 it("should withstand thundering herd of create appointment requests into the same room and time slots at the same time", async () => {
@@ -113,6 +133,14 @@ it("should withstand thundering herd of create appointment requests into the sam
       });
     }),
   );
+
+  const createdAppointmentsCount = await db.appointment.count({
+    where: {
+      startAt: { gte: input.startAt },
+      endAt: { lte: input.endAt },
+      roomId: input.roomId,
+    },
+  });
 
   const createdAppointment = appointments.find(
     (x) => x.status === "fulfilled",
@@ -130,4 +158,5 @@ it("should withstand thundering herd of create appointment requests into the sam
 
   expect(success).toBe(1);
   expect(failed).toBe(concurrent - 1);
+  expect(createdAppointmentsCount).toBe(1);
 });
