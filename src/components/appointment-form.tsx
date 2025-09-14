@@ -210,6 +210,7 @@ export function AppointmentForm() {
   const createAppointment = api.appointment.createAppointment.useMutation();
 
   const router = useRouter();
+  const utils = api.useUtils();
 
   const onSubmit = async (data: AppointmentFormData) => {
     console.log("Form data:", data);
@@ -267,6 +268,9 @@ export function AppointmentForm() {
         },
       )
       .unwrap();
+
+    await utils.appointment.getAppointments.invalidate();
+    await utils.appointment.getAppointmentsByRoomOrDoctorForTimeSlot.invalidate();
 
     router.push("/");
   };
