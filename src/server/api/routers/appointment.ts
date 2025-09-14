@@ -1,107 +1,95 @@
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedOrgProcedure } from "~/server/api/trpc";
 import {
   createAppointment,
   createAppointmentInputSchema,
 } from "./logics/create-appointment";
 
-// TODO: organizationId should come from user auth, but for now we use a fixed value
-
 export const appointmentRouter = createTRPCRouter({
   // Fetch all doctors
-  getDoctors: publicProcedure
-    .input(z.object({ organizationId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.doctor.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-        where: {
-          organizationId: input.organizationId,
-        },
-      });
-    }),
+  getDoctors: protectedOrgProcedure.query(async ({ ctx }) => {
+    return ctx.db.doctor.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        organizationId: ctx.activeOrganizationId,
+      },
+    });
+  }),
 
   // Fetch all services
-  getServices: publicProcedure
-    .input(z.object({ organizationId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.service.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-        where: {
-          organizationId: input.organizationId,
-        },
-      });
-    }),
+  getServices: protectedOrgProcedure.query(async ({ ctx }) => {
+    return ctx.db.service.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        organizationId: ctx.activeOrganizationId,
+      },
+    });
+  }),
 
   // Fetch all rooms
-  getRooms: publicProcedure
-    .input(z.object({ organizationId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.room.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-        where: {
-          organizationId: input.organizationId,
-        },
-      });
-    }),
+  getRooms: protectedOrgProcedure.query(async ({ ctx }) => {
+    return ctx.db.room.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        organizationId: ctx.activeOrganizationId,
+      },
+    });
+  }),
 
   // Fetch all devices
-  getDevices: publicProcedure
-    .input(z.object({ organizationId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.device.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-        where: {
-          organizationId: input.organizationId,
-        },
-      });
-    }),
+  getDevices: protectedOrgProcedure.query(async ({ ctx }) => {
+    return ctx.db.device.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        organizationId: ctx.activeOrganizationId,
+      },
+    });
+  }),
 
   // Fetch all patients
-  getPatients: publicProcedure
-    .input(z.object({ organizationId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.patient.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-        where: {
-          organizationId: input.organizationId,
-        },
-      });
-    }),
+  getPatients: protectedOrgProcedure.query(async ({ ctx }) => {
+    return ctx.db.patient.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+      where: {
+        organizationId: ctx.activeOrganizationId,
+      },
+    });
+  }),
 
   // Fetch all appointments
-  getAppointments: publicProcedure
+  getAppointments: protectedOrgProcedure
     .input(
       z.object({
         roomId: z.string().nullish(),
@@ -114,6 +102,7 @@ export const appointmentRouter = createTRPCRouter({
 
       const whereAnd: Prisma.AppointmentWhereInput[] = [
         {
+          organizationId: ctx.activeOrganizationId,
           startAt: { gte: input.from },
           endAt: { lte: input.to },
         },
@@ -137,7 +126,7 @@ export const appointmentRouter = createTRPCRouter({
       });
     }),
 
-  getAppointmentsByRoomOrDoctorForTimeSlot: publicProcedure
+  getAppointmentsByRoomOrDoctorForTimeSlot: protectedOrgProcedure
     .input(
       z.object({
         roomId: z.string(),
@@ -151,6 +140,7 @@ export const appointmentRouter = createTRPCRouter({
 
       return ctx.db.appointment.findMany({
         where: {
+          organizationId: ctx.activeOrganizationId,
           OR: [{ roomId: input.roomId }, { doctorId: input.doctorId }],
           startAt: { gte: input.from },
           endAt: { lte: input.to },
@@ -159,12 +149,11 @@ export const appointmentRouter = createTRPCRouter({
     }),
 
   // Create a new appointment
-  createAppointment: publicProcedure
+  createAppointment: protectedOrgProcedure
     .input(
       createAppointmentInputSchema.extend({
         // TODO: timezone should come from user auth, but for now we use a fixed value
         timezone: z.string().nonempty(),
-        organizationId: z.string().nonempty(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -172,7 +161,7 @@ export const appointmentRouter = createTRPCRouter({
 
       return await createAppointment({
         timezone: input.timezone,
-        organizationId: input.organizationId,
+        organizationId: ctx.activeOrganizationId,
         prisma: ctx.db,
         input,
       });

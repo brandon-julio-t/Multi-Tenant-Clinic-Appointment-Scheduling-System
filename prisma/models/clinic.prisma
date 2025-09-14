@@ -76,9 +76,9 @@ model Appointment {
   updatedAt          DateTime            @default(now()) @updatedAt
   appointmentDevices AppointmentDevice[]
 
-  @@index([startAt, endAt])
-  @@index([roomId, startAt, endAt])
-  @@index([doctorId, startAt, endAt])
+  @@index([organizationId, startAt, endAt])
+  @@index([organizationId, roomId, startAt, endAt])
+  @@index([organizationId, doctorId, startAt, endAt])
 }
 
 model AppointmentDevice {

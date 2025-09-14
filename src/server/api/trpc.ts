@@ -11,6 +11,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
+import { auth } from "~/lib/auth";
 
 /**
  * 1. CONTEXT
@@ -25,8 +26,14 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  // Get session from the headers
+  const session = await auth.api.getSession({
+    headers: opts.headers,
+  });
+
   return {
     db,
+    session,
     ...opts,
   };
 };
@@ -104,3 +111,65 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+/**
+ * Authentication middleware
+ *
+ * This middleware checks if the user is authenticated and throws an error if not.
+ * It also provides type safety for the session in protected procedures.
+ */
+const authMiddleware = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.session?.user) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  return next({
+    ctx: {
+      session: ctx.session,
+    },
+  });
+});
+
+/**
+ * Protected (authenticated) procedure
+ *
+ * This procedure guarantees that the user is authenticated and provides access to their session.
+ * Use this for any operations that require a logged-in user.
+ */
+export const protectedProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(authMiddleware);
+
+/**
+ * Organization middleware
+ *
+ * This middleware checks if the user has an active organization and throws an error if not.
+ * It builds upon the authMiddleware to ensure both authentication and organization context.
+ */
+const orgMiddleware = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.session?.session?.activeOrganizationId) {
+    throw new Error("ORGANIZATION_REQUIRED");
+  }
+
+  return next({
+    ctx: {
+      session: ctx.session,
+      activeOrganizationId: ctx.session.session.activeOrganizationId,
+    },
+  });
+});
+
+/**
+ * Protected organization procedure
+ *
+ * This procedure guarantees that:
+ * 1. The user is authenticated
+ * 2. The user has an active organization
+ * 3. Provides access to both the session and active organization ID
+ *
+ * Use this for operations that require both authentication and organization context.
+ */
+export const protectedOrgProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(authMiddleware)
+  .use(orgMiddleware);

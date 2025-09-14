@@ -74,28 +74,15 @@ const appointmentSchema = z.object({
 type AppointmentFormData = z.infer<typeof appointmentSchema>;
 
 export function AppointmentForm() {
-  // TODO: Get organizationId from user auth
-  const organizationId = "org_medical_center";
-
   const { timezone } = useAppTimezone();
   const { localTime, appTime } = useGlobalTime();
 
   // Fetch data using tRPC
-  const { data: doctors = [] } = api.appointment.getDoctors.useQuery({
-    organizationId,
-  });
-  const { data: services = [] } = api.appointment.getServices.useQuery({
-    organizationId,
-  });
-  const { data: rooms = [] } = api.appointment.getRooms.useQuery({
-    organizationId,
-  });
-  const { data: devices = [] } = api.appointment.getDevices.useQuery({
-    organizationId,
-  });
-  const { data: patients = [] } = api.appointment.getPatients.useQuery({
-    organizationId,
-  });
+  const { data: doctors = [] } = api.appointment.getDoctors.useQuery();
+  const { data: services = [] } = api.appointment.getServices.useQuery();
+  const { data: rooms = [] } = api.appointment.getRooms.useQuery();
+  const { data: devices = [] } = api.appointment.getDevices.useQuery();
+  const { data: patients = [] } = api.appointment.getPatients.useQuery();
 
   const form = useForm<AppointmentFormData>({
     mode: "onTouched",
@@ -258,7 +245,6 @@ export function AppointmentForm() {
         createAppointment.mutateAsync({
           ...data,
           timezone,
-          organizationId,
           startAt,
           endAt,
         }),
