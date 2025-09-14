@@ -266,7 +266,16 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
         className="relative flex h-full w-full flex-col gap-1 p-1 text-muted-foreground text-xs"
         key={day}
       >
+        <div
+          className={cn(
+            "bg-muted text-muted-foreground grid aspect-square size-fit place-items-center rounded-full border px-1.5 py-0.5",
+            isToday(setDate(new Date(), day)) &&
+              "bg-primary text-primary-foreground",
+          )}
+      >
         {day}
+        </div>
+
         <div>
           {featuresForDay.slice(0, 3).map((feature) => children({ feature }))}
         </div>
