@@ -137,6 +137,27 @@ export const appointmentRouter = createTRPCRouter({
       });
     }),
 
+  getAppointmentsByRoomOrDoctorForTimeSlot: publicProcedure
+    .input(
+      z.object({
+        roomId: z.string(),
+        doctorId: z.string(),
+        from: z.instanceof(Date),
+        to: z.instanceof(Date),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      console.log("input", input);
+
+      return ctx.db.appointment.findMany({
+        where: {
+          OR: [{ roomId: input.roomId }, { doctorId: input.doctorId }],
+          startAt: { gte: input.from },
+          endAt: { lte: input.to },
+        },
+      });
+    }),
+
   // Create a new appointment
   createAppointment: publicProcedure
     .input(

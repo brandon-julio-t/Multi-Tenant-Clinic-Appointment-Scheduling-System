@@ -114,17 +114,19 @@ export function AppointmentForm() {
     },
   });
 
+  const doctorId = form.watch("doctorId");
   const roomId = form.watch("roomId");
   const date = form.watch("appointmentDate");
 
   const { data: bookedAppointments = [] } =
-    api.appointment.getAppointments.useQuery(
+    api.appointment.getAppointmentsByRoomOrDoctorForTimeSlot.useQuery(
       {
         roomId,
+        doctorId,
         from: startOfDay(date, { in: tz(timezone) }),
         to: endOfDay(date, { in: tz(timezone) }),
       },
-      { enabled: !!roomId },
+      { enabled: !!roomId && !!doctorId },
     );
 
   const isTimeSlotBooked = React.useCallback(
