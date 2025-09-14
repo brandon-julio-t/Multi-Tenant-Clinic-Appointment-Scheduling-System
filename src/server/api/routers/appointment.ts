@@ -139,11 +139,19 @@ export const appointmentRouter = createTRPCRouter({
 
   // Create a new appointment
   createAppointment: publicProcedure
-    .input(createAppointmentInputSchema)
+    .input(
+      createAppointmentInputSchema.extend({
+        // TODO: timezone should come from user auth, but for now we use a fixed value
+        timezone: z.string().nonempty(),
+        organizationId: z.string().nonempty(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       console.log("input", input);
 
       return await createAppointment({
+        timezone: input.timezone,
+        organizationId: input.organizationId,
         prisma: ctx.db,
         input,
       });

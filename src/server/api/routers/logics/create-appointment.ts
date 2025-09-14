@@ -5,7 +5,6 @@ import { areIntervalsOverlapping, endOfDay, startOfDay } from "date-fns";
 import z from "zod";
 
 export const createAppointmentInputSchema = z.object({
-  organizationId: z.string().nonempty(),
   doctorId: z.string().nonempty(),
   serviceId: z.string().nonempty(),
   roomId: z.string().nonempty(),
@@ -17,10 +16,12 @@ export const createAppointmentInputSchema = z.object({
 
 export async function createAppointment({
   timezone,
+  organizationId,
   prisma,
   input,
 }: {
   timezone: string;
+  organizationId: string;
   prisma: PrismaClient;
   input: z.infer<typeof createAppointmentInputSchema>;
 }) {
@@ -82,7 +83,7 @@ export async function createAppointment({
 
     const createdAppointment = await tx.appointment.create({
       data: {
-        organizationId: input.organizationId,
+        organizationId: organizationId,
         doctorId: input.doctorId,
         serviceId: input.serviceId,
         roomId: input.roomId,

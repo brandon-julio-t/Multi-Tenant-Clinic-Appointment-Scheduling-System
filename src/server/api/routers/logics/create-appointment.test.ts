@@ -46,6 +46,7 @@ it("should create appointment successfully", async () => {
 
   const appointment = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: input,
   });
@@ -84,6 +85,7 @@ it("should throw an error if the room is already booked for the same time", asyn
 
   const appointment1 = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: input,
   });
@@ -93,6 +95,7 @@ it("should throw an error if the room is already booked for the same time", asyn
   try {
     await createAppointment({
       timezone,
+      organizationId: input.organizationId,
       prisma: db,
       input: input,
     });
@@ -126,6 +129,7 @@ it("should throw an error if the room is already booked with overlapping time #1
 
   const appointment1 = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: {
       ...input,
@@ -139,6 +143,7 @@ it("should throw an error if the room is already booked with overlapping time #1
   try {
     await createAppointment({
       timezone,
+      organizationId: input.organizationId,
       prisma: db,
       input: {
         ...input,
@@ -176,6 +181,7 @@ it("should throw an error if the room is already booked with overlapping time #2
 
   const appointment1 = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: {
       ...input,
@@ -189,6 +195,7 @@ it("should throw an error if the room is already booked with overlapping time #2
   try {
     await createAppointment({
       timezone,
+      organizationId: input.organizationId,
       prisma: db,
       input: {
         ...input,
@@ -230,6 +237,7 @@ it("should withstand thundering herd of create appointment requests into the sam
     Array.from({ length: concurrent }, async () => {
       return await createAppointment({
         timezone,
+        organizationId: input.organizationId,
         prisma: db,
         input: input,
       });
@@ -257,6 +265,7 @@ it("should throw an error if the doctor is already booked for the same time", as
 
   const appointment1 = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: input,
   });
@@ -275,6 +284,7 @@ it("should throw an error if the doctor is already booked for the same time", as
   try {
     await createAppointment({
       timezone,
+      organizationId: input.organizationId,
       prisma: db,
       input: {
         ...input,
@@ -311,6 +321,7 @@ it("should throw an error if the doctor is already booked with overlapping time 
 
   const appointment1 = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: {
       ...input,
@@ -333,6 +344,7 @@ it("should throw an error if the doctor is already booked with overlapping time 
   try {
     await createAppointment({
       timezone,
+      organizationId: input.organizationId,
       prisma: db,
       input: {
         ...input,
@@ -371,6 +383,7 @@ it("should throw an error if the doctor is already booked with overlapping time 
 
   const appointment1 = await createAppointment({
     timezone,
+    organizationId: input.organizationId,
     prisma: db,
     input: {
       ...input,
@@ -393,6 +406,7 @@ it("should throw an error if the doctor is already booked with overlapping time 
   try {
     await createAppointment({
       timezone,
+      organizationId: input.organizationId,
       prisma: db,
       input: {
         ...input,
@@ -443,6 +457,7 @@ it("should withstand thundering herd of create appointment requests for the same
 
       return await createAppointment({
         timezone,
+        organizationId: input.organizationId,
         prisma: db,
         input: {
           ...input,
