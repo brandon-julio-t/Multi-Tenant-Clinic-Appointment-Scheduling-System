@@ -7,6 +7,7 @@ import {
   endOfDay,
   endOfMonth,
   format,
+  isToday,
   set,
   startOfDay,
   startOfMonth,
@@ -76,7 +77,7 @@ export const AppointmentsCalendar = () => {
 
       return {
         id: appointment.id,
-        name: `${appointment.room.name}: ${appointment.doctor.name} - ${appointment.service.name} (${startTime} - ${endTime})`,
+        name: `${startTime} - ${endTime} @ ${appointment.room.name}: ${appointment.doctor.name} - ${appointment.service.name}`,
         startAt: appointment.startAt,
         endAt: appointment.endAt,
         status: {
