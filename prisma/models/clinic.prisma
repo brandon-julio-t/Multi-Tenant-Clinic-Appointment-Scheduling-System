@@ -78,6 +78,7 @@ model Appointment {
 
   @@index([startAt, endAt])
   @@index([roomId, startAt, endAt])
+  @@index([doctorId, startAt, endAt])
 }
 
 model AppointmentDevice {
