@@ -56,6 +56,7 @@ import { useAppTimezone, useGlobalTime } from "~/hooks/use-timezone";
 import { cn } from "~/lib/utils";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
+import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const appointmentSchema = z.object({
@@ -67,6 +68,7 @@ const appointmentSchema = z.object({
   appointmentDate: z.date(),
   startTime: z.string().min(1, "Please select a start time"),
   endTime: z.string().min(1, "Please select an end time"),
+  serviceDurationMinutes: z.number(),
 });
 
 type AppointmentFormData = z.infer<typeof appointmentSchema>;
@@ -107,6 +109,8 @@ export function AppointmentForm() {
       startTime: "",
       endTime: "",
       deviceIds: [],
+      // TODO: Get service duration from service, for now we use a fixed value first
+      serviceDurationMinutes: 30,
     },
   });
 
@@ -144,8 +148,7 @@ export function AppointmentForm() {
     [],
   );
 
-  // TODO: Get service duration from service, for now we use a fixed value first
-  const serviceDurationMinutes = 30;
+  const serviceDurationMinutes = form.watch("serviceDurationMinutes");
 
   const availableTimeSlots = React.useMemo(() => {
     const currentTime = new Date();
@@ -210,7 +213,7 @@ export function AppointmentForm() {
     }
 
     return timeSlots;
-  }, [doctorWorkingHours, isTimeSlotBooked, timezone]);
+  }, [doctorWorkingHours, isTimeSlotBooked, serviceDurationMinutes, timezone]);
 
   const startTime = form.watch("startTime");
   const endTime = form.watch("endTime");
@@ -252,6 +255,7 @@ export function AppointmentForm() {
       .promise(
         createAppointment.mutateAsync({
           ...data,
+          timezone,
           organizationId,
           startAt,
           endAt,
@@ -434,6 +438,25 @@ export function AppointmentForm() {
                   </FormItem>
                 )}
               />
+
+              {/* Service Duration Selector */}
+              <FormField
+                control={form.control}
+                name="serviceDurationMinutes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Service Duration</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Devices Multi-Select */}
@@ -492,78 +515,75 @@ export function AppointmentForm() {
             />
 
             {/* Available Time Slots */}
-            <FormField
-              control={form.control}
-              name="startTime"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Available Time Slots</FormLabel>
 
-                  <FormDescription>
-                    Click on a time slot to set the appointment time
-                  </FormDescription>
+            <FormItem>
+              <FormLabel>Available Time Slots</FormLabel>
 
-                  <FormDescription>Local Time: {localTime}</FormDescription>
+              <FormDescription>
+                Click on a time slot to set the appointment time
+              </FormDescription>
 
-                  <FormDescription>App Time: {appTime}</FormDescription>
+              <FormDescription>Local Time: {localTime}</FormDescription>
 
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-                    {availableTimeSlots.map((slot, index) => {
-                      const startTimeStr = format(slot.start, "HH:mm", {
-                        in: tz(timezone),
-                      });
-                      const endTimeStr = format(slot.end, "HH:mm", {
-                        in: tz(timezone),
-                      });
+              <FormDescription>App Time: {appTime}</FormDescription>
 
-                      const isSelected =
-                        startTimeStr === startTime && endTimeStr === endTime;
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                {availableTimeSlots.map((slot, index) => {
+                  const startTimeStr = format(slot.start, "HH:mm", {
+                    in: tz(timezone),
+                  });
+                  const endTimeStr = format(slot.end, "HH:mm", {
+                    in: tz(timezone),
+                  });
 
-                      return (
-                        <Tooltip key={`${startTimeStr}-${endTimeStr}-${index}`}>
-                          <TooltipTrigger asChild>
-                            <FormControl>
-                              <Button
-                                disabled={slot.disabled}
-                                type="button"
-                                variant={isSelected ? "default" : "outline"}
-                                size="sm"
-                                className="h-fit flex-col py-2 text-xs disabled:pointer-events-auto disabled:cursor-not-allowed"
-                                onClick={() => {
-                                  form.setValue("startTime", startTimeStr, {
-                                    shouldValidate: true,
-                                  });
-                                  form.setValue("endTime", endTimeStr, {
-                                    shouldValidate: true,
-                                  });
-                                }}
-                              >
-                                <div className="font-medium">
-                                  {startTimeStr} &mdash; {endTimeStr}
-                                </div>
-                              </Button>
-                            </FormControl>
-                          </TooltipTrigger>
-                          {slot.disabledReason && (
-                            <TooltipContent>
-                              {slot.disabledReason}
-                            </TooltipContent>
-                          )}
-                        </Tooltip>
-                      );
-                    })}
-                  </div>
+                  const isSelected =
+                    startTimeStr === startTime && endTimeStr === endTime;
 
-                  <FormMessage />
+                  return (
+                    <Tooltip key={`${startTimeStr}-${endTimeStr}-${index}`}>
+                      <TooltipTrigger asChild>
+                        <FormControl>
+                          <Button
+                            disabled={slot.disabled}
+                            type="button"
+                            variant={isSelected ? "default" : "outline"}
+                            size="sm"
+                            className="h-fit flex-col py-2 text-xs disabled:pointer-events-auto disabled:cursor-not-allowed"
+                            onClick={() => {
+                              form.setValue("startTime", startTimeStr, {
+                                shouldValidate: true,
+                              });
+                              form.setValue("endTime", endTimeStr, {
+                                shouldValidate: true,
+                              });
+                            }}
+                          >
+                            <div className="font-medium">
+                              {startTimeStr} &mdash; {endTimeStr}
+                            </div>
+                          </Button>
+                        </FormControl>
+                      </TooltipTrigger>
+                      {slot.disabledReason && (
+                        <TooltipContent>{slot.disabledReason}</TooltipContent>
+                      )}
+                    </Tooltip>
+                  );
+                })}
+              </div>
 
-                  <FormField
-                    control={form.control}
-                    name="endTime"
-                    render={() => <FormMessage />}
-                  />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="startTime"
+                render={() => <FormMessage />}
+              />
+
+              <FormField
+                control={form.control}
+                name="endTime"
+                render={() => <FormMessage />}
+              />
+            </FormItem>
 
             <Button
               type="submit"
