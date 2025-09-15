@@ -154,10 +154,26 @@ const orgMiddleware = t.middleware(async ({ ctx, next }) => {
     throw new Error("ORGANIZATION_REQUIRED");
   }
 
+  const organization = await ctx.db.organization.findUniqueOrThrow({
+    where: {
+      id: ctx.session.session.activeOrganizationId,
+    },
+    select: {
+      metadata: true,
+    },
+  });
+
+  const metadata = organization.metadata ?? "{}";
+
+  const metadataJson = JSON.parse(metadata) as {
+    timezone: string;
+  };
+
   return next({
     ctx: {
       session: ctx.session,
       activeOrganizationId: ctx.session.session.activeOrganizationId,
+      organizationTimezone: metadataJson.timezone,
     },
   });
 });
