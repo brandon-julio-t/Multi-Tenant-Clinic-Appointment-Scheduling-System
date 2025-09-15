@@ -89,11 +89,9 @@ export const monthsForLocale = (
   localeName: Intl.LocalesArgument,
   monthFormat: Intl.DateTimeFormatOptions["month"] = "long",
 ) => {
-  const format = new Intl.DateTimeFormat(localeName, { month: monthFormat })
-    .format;
-
+  const formatter = new Intl.DateTimeFormat(localeName, { month: monthFormat });
   return [...new Array(12).keys()].map((m) =>
-    format(new Date(Date.UTC(2021, m, 2))),
+    formatter.format(new Date(Date.UTC(2021, m, 2))),
   );
 };
 
@@ -236,7 +234,7 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
 
   // Memoize features filtering by day to avoid recalculating on every render
   const featuresByDay = useMemo(() => {
-    const result: { [day: number]: Feature[] } = {};
+    const result: Record<number, Feature[]> = {};
     for (let day = 1; day <= daysInMonth; day++) {
       result[day] = features.filter((feature) => {
         return isSameDay(new Date(feature.endAt), new Date(year, month, day));
@@ -259,7 +257,7 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const featuresForDay = featuresByDay[day] || [];
+    const featuresForDay = featuresByDay[day] ?? [];
 
     days.push(
       <div
