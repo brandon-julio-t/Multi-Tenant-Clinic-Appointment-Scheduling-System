@@ -40,6 +40,55 @@ async function generateStressTestData(organizations: Organization[]) {
   }
   console.log(`✅ Created ${doctors.length} additional doctors`);
 
+  // Generate doctor working hours
+  console.log("🕒 Generating doctor working hours...");
+  const workingHoursPromises = [];
+  for (const doctor of doctors) {
+    if (!doctor) continue;
+
+    // Generate random working hours for each doctor
+    const workingDays = faker.helpers.arrayElements([1, 2, 3, 4, 5], {
+      min: 3,
+      max: 5,
+    }); // 3-5 working days per week
+
+    for (const dayOfWeek of workingDays) {
+      const startHour = faker.helpers.arrayElement([
+        "08:00",
+        "08:30",
+        "09:00",
+        "09:30",
+        "10:00",
+      ]);
+      const duration = faker.helpers.arrayElement([8, 8.5, 9, 9.5, 10]); // 8-10 hour days
+      const startDate = new Date(`2024-01-01T${startHour}:00Z`);
+      const endDate = new Date(startDate);
+      endDate.setHours(endDate.getHours() + duration);
+
+      const endHour = endDate.toTimeString().slice(0, 5);
+      const id = faker.string.uuid();
+
+      workingHoursPromises.push(
+        db.doctorWorkingHour.create({
+          data: {
+            id,
+            doctorId: doctor.id,
+            dayOfWeek,
+            startHour,
+            endHour,
+            startAt: startDate,
+            endAt: endDate,
+          },
+        }),
+      );
+    }
+  }
+
+  const doctorWorkingHours = await Promise.all(workingHoursPromises);
+  console.log(
+    `✅ Created ${doctorWorkingHours.length} additional doctor working hours`,
+  );
+
   // Generate services
   console.log("🩺 Generating services...");
   const services = [];
@@ -99,6 +148,7 @@ async function generateStressTestData(organizations: Organization[]) {
           id,
           organizationId: org.id,
           name: serviceName!,
+          durationMinutes: faker.helpers.arrayElement([15, 30, 45, 60, 90]),
         },
       });
       services.push(service);
@@ -143,6 +193,7 @@ async function generateStressTestData(organizations: Organization[]) {
   console.log("\n🎯 STRESS TEST DATA ADDED SUCCESSFULLY!");
   console.log(`🏢 Organizations: ${organizations.length}`);
   console.log(`👨‍⚕️ Doctors: ${doctors.length}`);
+  console.log(`🕒 Doctor Working Hours: ${doctorWorkingHours.length}`);
   console.log(`🩺 Services: ${services.length}`);
   console.log(`👥 Patients: ${patients.length}`);
 }
@@ -617,6 +668,148 @@ async function main() {
 
   console.log(`✅ Created ${doctors.length} doctors`);
 
+  // Create doctor working hours
+  console.log("🕒 Creating doctor working hours...");
+  const doctorWorkingHours = await Promise.all([
+    // Working hours for Dr. Sarah Johnson (Medical Center) - Monday to Friday, 9 AM - 5 PM
+    ...Array.from({ length: 5 }, (_, i) => {
+      const dayOfWeek = i + 1; // Monday = 1, Tuesday = 2, etc.
+      return db.doctorWorkingHour.upsert({
+        where: { id: `wh_sarah_${dayOfWeek}` },
+        update: {},
+        create: {
+          id: `wh_sarah_${dayOfWeek}`,
+          doctorId: "doctor_sarah_johnson",
+          dayOfWeek,
+          startHour: "09:00",
+          endHour: "17:00",
+          startAt: new Date(`2024-01-01T09:00:00Z`),
+          endAt: new Date(`2024-01-01T17:00:00Z`),
+        },
+      });
+    }),
+    // Working hours for Dr. Emily Davis (Medical Center) - Monday, Wednesday, Friday, 8 AM - 4 PM
+    ...[1, 3, 5].map((dayOfWeek) =>
+      db.doctorWorkingHour.upsert({
+        where: { id: `wh_emily_${dayOfWeek}` },
+        update: {},
+        create: {
+          id: `wh_emily_${dayOfWeek}`,
+          doctorId: "doctor_emily_davis",
+          dayOfWeek,
+          startHour: "08:00",
+          endHour: "16:00",
+          startAt: new Date(`2024-01-01T08:00:00Z`),
+          endAt: new Date(`2024-01-01T16:00:00Z`),
+        },
+      }),
+    ),
+    // Working hours for Dr. Robert Miller (Medical Center) - Tuesday, Thursday, 10 AM - 6 PM
+    ...[2, 4].map((dayOfWeek) =>
+      db.doctorWorkingHour.upsert({
+        where: { id: `wh_robert_${dayOfWeek}` },
+        update: {},
+        create: {
+          id: `wh_robert_${dayOfWeek}`,
+          doctorId: "doctor_robert_miller",
+          dayOfWeek,
+          startHour: "10:00",
+          endHour: "18:00",
+          startAt: new Date(`2024-01-01T10:00:00Z`),
+          endAt: new Date(`2024-01-01T18:00:00Z`),
+        },
+      }),
+    ),
+    // Working hours for Dr. Michael Chen (Family Practice) - Monday to Friday, 9 AM - 5 PM
+    ...Array.from({ length: 5 }, (_, i) => {
+      const dayOfWeek = i + 1;
+      return db.doctorWorkingHour.upsert({
+        where: { id: `wh_michael_${dayOfWeek}` },
+        update: {},
+        create: {
+          id: `wh_michael_${dayOfWeek}`,
+          doctorId: "doctor_michael_chen",
+          dayOfWeek,
+          startHour: "09:00",
+          endHour: "17:00",
+          startAt: new Date(`2024-01-01T09:00:00Z`),
+          endAt: new Date(`2024-01-01T17:00:00Z`),
+        },
+      });
+    }),
+    // Working hours for Dr. Lisa Parker (Family Practice) - Monday, Wednesday, Friday, 8:30 AM - 4:30 PM
+    ...[1, 3, 5].map((dayOfWeek) =>
+      db.doctorWorkingHour.upsert({
+        where: { id: `wh_lisa_${dayOfWeek}` },
+        update: {},
+        create: {
+          id: `wh_lisa_${dayOfWeek}`,
+          doctorId: "doctor_lisa_parker",
+          dayOfWeek,
+          startHour: "08:30",
+          endHour: "16:30",
+          startAt: new Date(`2024-01-01T08:30:00Z`),
+          endAt: new Date(`2024-01-01T16:30:00Z`),
+        },
+      }),
+    ),
+    // Working hours for Dr. David Kim (Specialty Clinic) - Tuesday to Thursday, 9 AM - 5 PM
+    ...[2, 3, 4].map((dayOfWeek) =>
+      db.doctorWorkingHour.upsert({
+        where: { id: `wh_david_${dayOfWeek}` },
+        update: {},
+        create: {
+          id: `wh_david_${dayOfWeek}`,
+          doctorId: "doctor_david_kim",
+          dayOfWeek,
+          startHour: "09:00",
+          endHour: "17:00",
+          startAt: new Date(`2024-01-01T09:00:00Z`),
+          endAt: new Date(`2024-01-01T17:00:00Z`),
+        },
+      }),
+    ),
+    // Working hours for bulk generated doctors
+    ...doctors.slice(6).flatMap((doctor, _doctorIndex) => {
+      if (!doctor) return [];
+
+      // Generate random working hours for bulk doctors
+      const workingDays = faker.helpers.arrayElements([1, 2, 3, 4, 5], {
+        min: 3,
+        max: 5,
+      }); // 3-5 working days per week
+      return workingDays.map((dayOfWeek) => {
+        const startHour = faker.helpers.arrayElement([
+          "08:00",
+          "08:30",
+          "09:00",
+          "09:30",
+          "10:00",
+        ]);
+        const duration = faker.helpers.arrayElement([8, 8.5, 9, 9.5, 10]); // 8-10 hour days
+        const startDate = new Date(`2024-01-01T${startHour}:00Z`);
+        const endDate = new Date(startDate);
+        endDate.setHours(endDate.getHours() + duration);
+
+        const endHour = endDate.toTimeString().slice(0, 5);
+
+        return db.doctorWorkingHour.create({
+          data: {
+            id: faker.string.uuid(),
+            doctorId: doctor.id,
+            dayOfWeek,
+            startHour,
+            endHour,
+            startAt: startDate,
+            endAt: endDate,
+          },
+        });
+      });
+    }),
+  ]);
+
+  console.log(`✅ Created ${doctorWorkingHours.length} doctor working hours`);
+
   // Create services
   const services = await Promise.all([
     // Keep existing services (use upsert to handle existing data)
@@ -627,6 +820,7 @@ async function main() {
         id: "service_general_checkup",
         organizationId: "org_medical_center",
         name: "General Checkup",
+        durationMinutes: 30,
       },
     }),
     db.service.upsert({
@@ -636,6 +830,7 @@ async function main() {
         id: "service_cardiology",
         organizationId: "org_medical_center",
         name: "Cardiology Consultation",
+        durationMinutes: 45,
       },
     }),
     db.service.upsert({
@@ -645,6 +840,7 @@ async function main() {
         id: "service_dermatology",
         organizationId: "org_medical_center",
         name: "Dermatology",
+        durationMinutes: 30,
       },
     }),
     db.service.upsert({
@@ -654,6 +850,7 @@ async function main() {
         id: "service_orthopedics",
         organizationId: "org_medical_center",
         name: "Orthopedics",
+        durationMinutes: 45,
       },
     }),
     db.service.upsert({
@@ -663,6 +860,7 @@ async function main() {
         id: "service_pediatrics",
         organizationId: "org_medical_center",
         name: "Pediatrics",
+        durationMinutes: 30,
       },
     }),
     db.service.upsert({
@@ -672,6 +870,7 @@ async function main() {
         id: "service_family_medicine",
         organizationId: "org_family_practice",
         name: "Family Medicine",
+        durationMinutes: 30,
       },
     }),
     db.service.upsert({
@@ -681,6 +880,7 @@ async function main() {
         id: "service_annual_physical",
         organizationId: "org_family_practice",
         name: "Annual Physical",
+        durationMinutes: 60,
       },
     }),
     db.service.upsert({
@@ -690,6 +890,7 @@ async function main() {
         id: "service_vaccinations",
         organizationId: "org_family_practice",
         name: "Vaccinations",
+        durationMinutes: 15,
       },
     }),
     db.service.upsert({
@@ -699,6 +900,7 @@ async function main() {
         id: "service_womens_health",
         organizationId: "org_family_practice",
         name: "Women's Health",
+        durationMinutes: 45,
       },
     }),
     db.service.upsert({
@@ -708,6 +910,7 @@ async function main() {
         id: "service_neurology",
         organizationId: "org_specialty_clinic",
         name: "Neurology",
+        durationMinutes: 60,
       },
     }),
     db.service.upsert({
@@ -717,6 +920,7 @@ async function main() {
         id: "service_psychiatry",
         organizationId: "org_specialty_clinic",
         name: "Psychiatry",
+        durationMinutes: 50,
       },
     }),
     // Add many more services for stress testing
@@ -829,6 +1033,7 @@ async function main() {
           id,
           organizationId: orgId,
           name: serviceName,
+          durationMinutes: faker.helpers.arrayElement([15, 30, 45, 60, 90]),
         },
       });
     }).filter(Boolean),
@@ -1644,7 +1849,7 @@ async function main() {
 
       // Create multiple associations per appointment (1-3 devices per appointment)
       const associationsPerAppointment = faker.number.int({ min: 1, max: 3 });
-      const associationIndex = i % associationsPerAppointment;
+      const _associationIndex = i % associationsPerAppointment;
 
       const id = faker.string.uuid();
 
@@ -1666,6 +1871,7 @@ async function main() {
   console.log("\n📊 STRESS TEST DATA SUMMARY:");
   console.log(`🏢 Organizations: ${organizations.length}`);
   console.log(`👨‍⚕️ Doctors: ${doctors.length}`);
+  console.log(`🕒 Doctor Working Hours: ${doctorWorkingHours.length}`);
   console.log(`🩺 Services: ${services.length}`);
   console.log(`🏥 Rooms: ${rooms.length}`);
   console.log(`🔧 Devices: ${devices.length}`);

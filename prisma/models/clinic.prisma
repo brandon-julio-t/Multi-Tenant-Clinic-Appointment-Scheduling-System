@@ -1,23 +1,43 @@
 model Doctor {
-  id             String        @id @default(ulid())
-  organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  name           String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now()) @updatedAt
-  appointments   Appointment[]
+  id                 String              @id @default(ulid())
+  organizationId     String
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name               String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now()) @updatedAt
+  appointments       Appointment[]
+  doctorWorkingHours DoctorWorkingHour[]
 
   @@index([organizationId])
 }
 
+model DoctorWorkingHour {
+  id        String   @id @default(ulid())
+  doctorId  String
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  /// 0-6 for sunday to saturday
+  dayOfWeek Int
+  /// hh:mm
+  startHour String
+  /// hh:mm
+  endHour   String
+  startAt   DateTime
+  endAt     DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([doctorId, dayOfWeek])
+}
+
 model Service {
-  id             String        @id @default(ulid())
-  organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  name           String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now()) @updatedAt
-  appointments   Appointment[]
+  id              String        @id @default(ulid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name            String
+  durationMinutes Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  appointments    Appointment[]
 
   @@index([organizationId])
 }
