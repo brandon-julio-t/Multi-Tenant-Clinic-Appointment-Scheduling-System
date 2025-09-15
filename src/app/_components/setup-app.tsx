@@ -44,13 +44,17 @@ export const SetupApp = ({ children }: { children: React.ReactNode }) => {
           }
         }
 
-        // TODO: Get timezone from organization country
-        setTimezone("Europe/Berlin");
+        const orgMeta = (activeOrgQuery.data?.metadata ?? {}) as {
+          timezone?: string;
+        };
+
+        setTimezone(orgMeta.timezone ?? "Europe/Berlin");
 
         setIsSetupDone(true);
       })();
     },
     [
+      activeOrgQuery.data,
       pathname,
       router,
       sessionQuery.data,
