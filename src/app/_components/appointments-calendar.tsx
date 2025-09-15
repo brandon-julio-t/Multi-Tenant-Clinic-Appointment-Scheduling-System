@@ -197,6 +197,12 @@ function AppointmentsByDaySheetContent({
                     Service: {appointment.service.name}
                   </CardDescription>
                   <CardDescription className="truncate">
+                    Date{" "}
+                    {format(appointment.startAt, "PPP", {
+                      in: tz(timezone),
+                    })}
+                  </CardDescription>
+                  <CardDescription className="truncate">
                     Start Time:{" "}
                     {format(appointment.startAt, "pppp", {
                       in: tz(timezone),

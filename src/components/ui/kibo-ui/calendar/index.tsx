@@ -1,6 +1,15 @@
 "use client";
 
-import { getDay, getDaysInMonth, isSameDay, isToday, setDate } from "date-fns";
+import { tz } from "@date-fns/tz";
+import {
+  constructNow,
+  getDay,
+  getDaysInMonth,
+  isSameDay,
+  isToday,
+  set,
+  setDate,
+} from "date-fns";
 import { atom, useAtom } from "jotai";
 import {
   Check,
@@ -31,6 +40,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { useAppTimezone } from "~/hooks/use-timezone";
 import { cn } from "~/lib/utils";
 
 export type CalendarState = {
@@ -194,6 +204,8 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
   const [year] = useCalendarYear();
   const { startDay } = useContext(CalendarContext);
 
+  const { timezone } = useAppTimezone();
+
   // Memoize expensive date calculations
   const currentMonthDate = useMemo(
     () => new Date(year, month, 1),
@@ -237,11 +249,24 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
     const result: Record<number, Feature[]> = {};
     for (let day = 1; day <= daysInMonth; day++) {
       result[day] = features.filter((feature) => {
-        return isSameDay(new Date(feature.endAt), new Date(year, month, day));
+        const date1 = new Date(feature.endAt);
+        const date2 = set(
+          new Date(),
+          {
+            year,
+            month,
+            date: day,
+          },
+          { in: tz(timezone) },
+        );
+
+        return isSameDay(date1, date2, {
+          in: tz(timezone),
+        });
       });
     }
     return result;
-  }, [features, daysInMonth, year, month]);
+  }, [daysInMonth, features, month, timezone, year]);
 
   const days: ReactNode[] = [];
 
