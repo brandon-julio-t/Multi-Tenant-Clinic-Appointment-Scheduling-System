@@ -48,6 +48,13 @@ export async function createAppointment({
           { start: input.startAt, end: input.endAt },
         )
       ) {
+        console.log(
+          "Room conflict with appointment",
+          appointment,
+          { start: appointment.startAt, end: appointment.endAt },
+          { start: input.startAt, end: input.endAt },
+        );
+
         throw new TRPCError({
           code: "CONFLICT",
           message: "Room is already booked for this time",
@@ -74,6 +81,13 @@ export async function createAppointment({
           { start: input.startAt, end: input.endAt },
         )
       ) {
+        console.log(
+          "Doctor conflict with appointment",
+          appointment,
+          { start: appointment.startAt, end: appointment.endAt },
+          { start: input.startAt, end: input.endAt },
+        );
+
         throw new TRPCError({
           code: "CONFLICT",
           message: "Doctor is already booked for this time",
