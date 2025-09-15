@@ -77,7 +77,6 @@ type AppointmentFormData = z.infer<typeof appointmentSchema>;
 
 export function AppointmentForm() {
   const { timezone } = useAppTimezone();
-  const { localTime, appTime } = useGlobalTime();
 
   // Fetch data using tRPC
   const getDoctorsQuery = api.appointment.getDoctors.useQuery();
@@ -464,9 +463,7 @@ export function AppointmentForm() {
                 Click on a time slot to set the appointment time
               </FormDescription>
 
-              <FormDescription>Local Time: {localTime}</FormDescription>
-
-              <FormDescription>App Time: {appTime}</FormDescription>
+              <GlobalTime />
 
               {getTimeSlotsQuery.isLoading ? (
                 <GridSkeleton
@@ -568,5 +565,17 @@ export function AppointmentForm() {
         </Form>
       </CardContent>
     </Card>
+  );
+}
+
+function GlobalTime() {
+  const { localTime, appTime } = useGlobalTime();
+
+  return (
+    <>
+      <FormDescription>Local Time: {localTime}</FormDescription>
+
+      <FormDescription>App Time: {appTime}</FormDescription>
+    </>
   );
 }

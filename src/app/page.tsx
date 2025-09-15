@@ -1,25 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { AppointmentsCalendar } from "./_components/appointments-calendar";
 import { Button } from "~/components/ui/button";
 import { useSession } from "~/lib/auth-client";
-import { useGlobalTime } from "~/hooks/use-timezone";
+import { AppointmentsCalendar } from "./_components/appointments-calendar";
+import { GlobalTime } from "./_components/global-time";
 
 const HomePage = () => {
   const { data } = useSession();
 
-  const { localTime, appTime } = useGlobalTime();
-
   return (
     <main className="container mx-auto py-16">
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-bold">Welcome, {data?.user.name}</h1>
+        <h1 className="text-2xl font-bold">
+          Welcome, {data?.user.name} ({data?.user.email})
+        </h1>
 
-        <div>
-          <div>Local Time: {localTime}</div>
-          <div>App Time: {appTime}</div>
-        </div>
+        <GlobalTime />
 
         <section className="flex justify-end">
           <Button asChild>
