@@ -2,24 +2,14 @@
 
 import { tz } from "@date-fns/tz";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  addMinutes,
-  areIntervalsOverlapping,
-  constructNow,
-  endOfDay,
-  format,
-  isBefore,
-  set,
-  startOfDay,
-  startOfToday,
-} from "date-fns";
+import { endOfDay, format, set, startOfDay, startOfToday } from "date-fns";
 import { CalendarIcon, Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import type { TRPCClientError } from "@trpc/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
@@ -56,7 +46,20 @@ import { useAppTimezone, useGlobalTime } from "~/hooks/use-timezone";
 import { cn } from "~/lib/utils";
 import type { AppRouter } from "~/server/api/root";
 import { api } from "~/trpc/react";
-import { Input } from "./ui/input";
+import {
+  EmptyDevicesState,
+  EmptyDoctorsState,
+  EmptyPatientsState,
+  EmptyRoomsState,
+  EmptyServicesState,
+  EmptyTimeSlotsState,
+  TimeSlotsDisabledState,
+} from "./empty-states";
+import {
+  CheckboxSkeleton,
+  GridSkeleton,
+  SelectSkeleton,
+} from "./loading-skeletons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const appointmentSchema = z.object({
@@ -68,7 +71,6 @@ const appointmentSchema = z.object({
   appointmentDate: z.date(),
   startTime: z.string().min(1, "Please select a start time"),
   endTime: z.string().min(1, "Please select an end time"),
-  serviceDurationMinutes: z.number(),
 });
 
 type AppointmentFormData = z.infer<typeof appointmentSchema>;
@@ -78,11 +80,11 @@ export function AppointmentForm() {
   const { localTime, appTime } = useGlobalTime();
 
   // Fetch data using tRPC
-  const { data: doctors = [] } = api.appointment.getDoctors.useQuery();
-  const { data: services = [] } = api.appointment.getServices.useQuery();
-  const { data: rooms = [] } = api.appointment.getRooms.useQuery();
-  const { data: devices = [] } = api.appointment.getDevices.useQuery();
-  const { data: patients = [] } = api.appointment.getPatients.useQuery();
+  const getDoctorsQuery = api.appointment.getDoctors.useQuery();
+  const getServicesQuery = api.appointment.getServices.useQuery();
+  const getRoomsQuery = api.appointment.getRooms.useQuery();
+  const getDevicesQuery = api.appointment.getDevices.useQuery();
+  const getPatientsQuery = api.appointment.getPatients.useQuery();
 
   const form = useForm<AppointmentFormData>({
     mode: "onTouched",
@@ -92,117 +94,29 @@ export function AppointmentForm() {
       serviceId: "",
       roomId: "",
       patientId: "",
-      appointmentDate: new Date(),
+      appointmentDate: startOfToday({ in: tz(timezone) }),
       startTime: "",
       endTime: "",
       deviceIds: [],
-      // TODO: Get service duration from service, for now we use a fixed value first
-      serviceDurationMinutes: 30,
     },
   });
 
   const doctorId = form.watch("doctorId");
   const roomId = form.watch("roomId");
+  const serviceId = form.watch("serviceId");
   const date = form.watch("appointmentDate");
 
-  const { data: bookedAppointments = [] } =
-    api.appointment.getAppointmentsByRoomOrDoctorForTimeSlot.useQuery(
+  const getTimeSlotsQuery =
+    api.appointment.getAvailableTimeSlotsForCreateAppointment.useQuery(
       {
         roomId,
         doctorId,
+        serviceId,
         from: startOfDay(date, { in: tz(timezone) }),
         to: endOfDay(date, { in: tz(timezone) }),
       },
-      { enabled: !!roomId && !!doctorId },
+      { enabled: !!roomId && !!doctorId && !!serviceId },
     );
-
-  const isTimeSlotBooked = React.useCallback(
-    (start: Date, end: Date) => {
-      return bookedAppointments.some((appointment) => {
-        return areIntervalsOverlapping(
-          { start, end },
-          { start: appointment.startAt, end: appointment.endAt },
-        );
-      });
-    },
-    [bookedAppointments],
-  );
-
-  // TODO: Get doctor working hours from doctor, for now we use a fixed value first
-  const doctorWorkingHours = React.useMemo(
-    () => [
-      { startHour: "09:00", endHour: "11:00" }, // 9 AM to 11 AM
-      { startHour: "13:00", endHour: "18:00" }, // 1 PM to 6 PM
-    ],
-    [],
-  );
-
-  const serviceDurationMinutes = form.watch("serviceDurationMinutes");
-
-  const availableTimeSlots = React.useMemo(() => {
-    const currentTime = new Date();
-    const now = startOfToday({ in: tz(timezone) });
-
-    const timeSlots: Array<{
-      start: Date;
-      end: Date;
-      disabled: boolean;
-      disabledReason?: string;
-    }> = [];
-
-    for (const workingHour of doctorWorkingHours) {
-      const [startHour, startMinute] = workingHour.startHour.split(":");
-      const [endHour, endMinute] = workingHour.endHour.split(":");
-
-      const end = set(
-        now,
-        {
-          hours: parseInt(endHour ?? "00"),
-          minutes: parseInt(endMinute ?? "00"),
-          seconds: 0,
-          milliseconds: 0,
-        },
-        { in: tz(timezone) },
-      );
-
-      let curr = set(
-        now,
-        {
-          hours: parseInt(startHour ?? "00"),
-          minutes: parseInt(startMinute ?? "00"),
-          seconds: 0,
-          milliseconds: 0,
-        },
-        { in: tz(timezone) },
-      );
-
-      while (isBefore(curr, end)) {
-        const start = curr;
-        const end = addMinutes(curr, serviceDurationMinutes, {
-          in: tz(timezone),
-        });
-
-        const isPastTime = isBefore(start, constructNow(currentTime));
-        const isBooked = isTimeSlotBooked(start, end);
-
-        const disabledReason = isPastTime
-          ? "Past time"
-          : isBooked
-            ? "Time slot booked"
-            : undefined;
-
-        timeSlots.push({
-          start: start,
-          end: end,
-          disabled: isPastTime || isBooked,
-          disabledReason,
-        });
-        curr = addMinutes(curr, serviceDurationMinutes, { in: tz(timezone) });
-      }
-    }
-
-    return timeSlots;
-  }, [doctorWorkingHours, isTimeSlotBooked, serviceDurationMinutes, timezone]);
 
   const startTime = form.watch("startTime");
   const endTime = form.watch("endTime");
@@ -245,7 +159,6 @@ export function AppointmentForm() {
       .promise(
         createAppointment.mutateAsync({
           ...data,
-          timezone,
           startAt,
           endAt,
         }),
@@ -270,7 +183,7 @@ export function AppointmentForm() {
       .unwrap();
 
     await utils.appointment.getAppointments.invalidate();
-    await utils.appointment.getAppointmentsByRoomOrDoctorForTimeSlot.invalidate();
+    await utils.appointment.getAvailableTimeSlotsForCreateAppointment.invalidate();
 
     router.push("/");
   };
@@ -294,20 +207,29 @@ export function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Doctor</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a doctor" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {doctors.map((doctor) => (
-                          <SelectItem key={doctor.id} value={doctor.id}>
-                            {doctor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {getDoctorsQuery.isLoading ? (
+                      <SelectSkeleton />
+                    ) : (getDoctorsQuery.data ?? []).length === 0 ? (
+                      <EmptyDoctorsState />
+                    ) : (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a doctor" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(getDoctorsQuery.data ?? []).map((doctor) => (
+                            <SelectItem key={doctor.id} value={doctor.id}>
+                              {doctor.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -320,20 +242,29 @@ export function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Service</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a service" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {services.map((service) => (
-                          <SelectItem key={service.id} value={service.id}>
-                            {service.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {getServicesQuery.isLoading ? (
+                      <SelectSkeleton />
+                    ) : (getServicesQuery.data ?? []).length === 0 ? (
+                      <EmptyServicesState />
+                    ) : (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a service" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(getServicesQuery.data ?? []).map((service) => (
+                            <SelectItem key={service.id} value={service.id}>
+                              {service.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -346,20 +277,29 @@ export function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Room</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a room" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {rooms.map((room) => (
-                          <SelectItem key={room.id} value={room.id}>
-                            {room.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {getRoomsQuery.isLoading ? (
+                      <SelectSkeleton />
+                    ) : (getRoomsQuery.data ?? []).length === 0 ? (
+                      <EmptyRoomsState />
+                    ) : (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a room" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(getRoomsQuery.data ?? []).map((room) => (
+                            <SelectItem key={room.id} value={room.id}>
+                              {room.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -372,20 +312,29 @@ export function AppointmentForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Patient</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a patient" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {patients.map((patient) => (
-                          <SelectItem key={patient.id} value={patient.id}>
-                            {patient.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {getPatientsQuery.isLoading ? (
+                      <SelectSkeleton />
+                    ) : (getPatientsQuery.data ?? []).length === 0 ? (
+                      <EmptyPatientsState />
+                    ) : (
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a patient" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(getPatientsQuery.data ?? []).map((patient) => (
+                            <SelectItem key={patient.id} value={patient.id}>
+                              {patient.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -409,7 +358,13 @@ export function AppointmentForm() {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP", { in: tz(timezone) })
+                              format(
+                                startOfDay(field.value, {
+                                  in: tz(timezone),
+                                }),
+                                "PPP",
+                                { in: tz(timezone) },
+                              )
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -420,31 +375,15 @@ export function AppointmentForm() {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
+                          timeZone={timezone}
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={{ before: new Date() }}
+                          disabled={{
+                            before: startOfToday({ in: tz(timezone) }),
+                          }}
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Service Duration Selector */}
-              <FormField
-                control={form.control}
-                name="serviceDurationMinutes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Service Duration</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -463,44 +402,54 @@ export function AppointmentForm() {
                       Select the devices needed for this appointment.
                     </FormDescription>
                   </div>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {devices.map((device) => (
-                      <FormField
-                        key={device.id}
-                        control={form.control}
-                        name="deviceIds"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={device.id}
-                              className="flex flex-row items-start space-y-0 space-x-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(device.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([
-                                          ...field.value,
-                                          device.id,
-                                        ])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== device.id,
-                                          ),
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {device.name}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    ))}
-                  </div>
+                  {getDevicesQuery.isLoading ? (
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      {Array.from({ length: 6 }).map((_, index) => (
+                        <CheckboxSkeleton key={index} />
+                      ))}
+                    </div>
+                  ) : (getDevicesQuery.data ?? []).length === 0 ? (
+                    <EmptyDevicesState />
+                  ) : (
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      {(getDevicesQuery.data ?? []).map((device) => (
+                        <FormField
+                          key={device.id}
+                          control={form.control}
+                          name="deviceIds"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={device.id}
+                                className="flex flex-row items-start space-y-0 space-x-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(device.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            device.id,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== device.id,
+                                            ),
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {device.name}
+                                </FormLabel>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -519,50 +468,67 @@ export function AppointmentForm() {
 
               <FormDescription>App Time: {appTime}</FormDescription>
 
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-                {availableTimeSlots.map((slot, index) => {
-                  const startTimeStr = format(slot.start, "HH:mm", {
-                    in: tz(timezone),
-                  });
-                  const endTimeStr = format(slot.end, "HH:mm", {
-                    in: tz(timezone),
-                  });
+              {getTimeSlotsQuery.isLoading ? (
+                <GridSkeleton
+                  rows={3}
+                  cols={4}
+                  itemHeight="h-12"
+                  className="grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4"
+                />
+              ) : !doctorId || !serviceId || !roomId ? (
+                <TimeSlotsDisabledState
+                  selectedDoctor={!!doctorId}
+                  selectedService={!!serviceId}
+                  selectedRoom={!!roomId}
+                />
+              ) : (getTimeSlotsQuery.data ?? []).length === 0 ? (
+                <EmptyTimeSlotsState />
+              ) : (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                  {(getTimeSlotsQuery.data ?? []).map((slot, index) => {
+                    const startTimeStr = format(slot.start, "HH:mm", {
+                      in: tz(timezone),
+                    });
+                    const endTimeStr = format(slot.end, "HH:mm", {
+                      in: tz(timezone),
+                    });
 
-                  const isSelected =
-                    startTimeStr === startTime && endTimeStr === endTime;
+                    const isSelected =
+                      startTimeStr === startTime && endTimeStr === endTime;
 
-                  return (
-                    <Tooltip key={`${startTimeStr}-${endTimeStr}-${index}`}>
-                      <TooltipTrigger asChild>
-                        <FormControl>
-                          <Button
-                            disabled={slot.disabled}
-                            type="button"
-                            variant={isSelected ? "default" : "outline"}
-                            size="sm"
-                            className="h-fit flex-col py-2 text-xs disabled:pointer-events-auto disabled:cursor-not-allowed"
-                            onClick={() => {
-                              form.setValue("startTime", startTimeStr, {
-                                shouldValidate: true,
-                              });
-                              form.setValue("endTime", endTimeStr, {
-                                shouldValidate: true,
-                              });
-                            }}
-                          >
-                            <div className="font-medium">
-                              {startTimeStr} &mdash; {endTimeStr}
-                            </div>
-                          </Button>
-                        </FormControl>
-                      </TooltipTrigger>
-                      {slot.disabledReason && (
-                        <TooltipContent>{slot.disabledReason}</TooltipContent>
-                      )}
-                    </Tooltip>
-                  );
-                })}
-              </div>
+                    return (
+                      <Tooltip key={`${startTimeStr}-${endTimeStr}-${index}`}>
+                        <TooltipTrigger asChild>
+                          <FormControl>
+                            <Button
+                              disabled={slot.disabled}
+                              type="button"
+                              variant={isSelected ? "default" : "outline"}
+                              size="sm"
+                              className="h-fit flex-col py-2 text-xs disabled:pointer-events-auto disabled:cursor-not-allowed"
+                              onClick={() => {
+                                form.setValue("startTime", startTimeStr, {
+                                  shouldValidate: true,
+                                });
+                                form.setValue("endTime", endTimeStr, {
+                                  shouldValidate: true,
+                                });
+                              }}
+                            >
+                              <div className="font-medium">
+                                {startTimeStr} &mdash; {endTimeStr}
+                              </div>
+                            </Button>
+                          </FormControl>
+                        </TooltipTrigger>
+                        {slot.disabledReason && (
+                          <TooltipContent>{slot.disabledReason}</TooltipContent>
+                        )}
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              )}
 
               <FormField
                 control={form.control}
@@ -588,6 +554,15 @@ export function AppointmentForm() {
               {form.formState.isSubmitting
                 ? "Creating appointment..."
                 : "Create Appointment"}
+            </Button>
+
+            <Button
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+              variant="outline"
+              asChild
+            >
+              <Link href="/">Cancel</Link>
             </Button>
           </form>
         </Form>
