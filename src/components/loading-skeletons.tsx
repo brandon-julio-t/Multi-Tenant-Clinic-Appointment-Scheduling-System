@@ -38,7 +38,7 @@ export function CheckboxSkeleton({
 }: React.ComponentProps<"div">) {
   return (
     <div
-      className={`flex items-center space-x-2 ${className || ""}`}
+      className={`flex items-center space-x-2 ${className ?? ""}`}
       {...props}
     >
       <Skeleton className="h-4 w-4 rounded" />
@@ -62,10 +62,45 @@ export function GridSkeleton({
   itemHeight?: string;
   className?: string;
 } & React.ComponentProps<"div">) {
+  // Map cols to static Tailwind grid classes for CSS purging compatibility
+  const getGridColsClass = (cols: number): string => {
+    switch (cols) {
+      case 1:
+        return "grid-cols-1";
+      case 2:
+        return "grid-cols-2";
+      case 3:
+        return "grid-cols-3";
+      case 4:
+        return "grid-cols-4";
+      case 5:
+        return "grid-cols-5";
+      case 6:
+        return "grid-cols-6";
+      case 7:
+        return "grid-cols-7";
+      case 8:
+        return "grid-cols-8";
+      case 9:
+        return "grid-cols-9";
+      case 10:
+        return "grid-cols-10";
+      case 11:
+        return "grid-cols-11";
+      case 12:
+        return "grid-cols-12";
+      default:
+        return "grid-cols-4"; // fallback to 4 columns
+    }
+  };
+
   return (
     <div className={className} {...props}>
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className={`grid grid-cols-${cols} mb-2 gap-2`}>
+        <div
+          key={rowIndex}
+          className={`grid ${getGridColsClass(cols)} mb-2 gap-2`}
+        >
           {Array.from({ length: cols }).map((_, colIndex) => (
             <Skeleton
               key={`${rowIndex}-${colIndex}`}
@@ -90,7 +125,7 @@ export function CardSkeleton({
   className?: string;
 } & React.ComponentProps<"div">) {
   return (
-    <div className={`rounded-lg border p-4 ${className || ""}`} {...props}>
+    <div className={`rounded-lg border p-4 ${className ?? ""}`} {...props}>
       <Skeleton className="mb-3 h-6 w-3/4" />
       {Array.from({ length: lines }).map((_, index) => (
         <Skeleton
@@ -133,7 +168,7 @@ export function ListSkeleton({
   className?: string;
 } & React.ComponentProps<"div">) {
   return (
-    <div className={`space-y-3 ${className || ""}`} {...props}>
+    <div className={`space-y-3 ${className ?? ""}`} {...props}>
       {Array.from({ length: count }).map((_, index) => (
         <div key={index} className="flex items-center space-x-3">
           <Skeleton className="h-4 w-4 rounded-full" />
