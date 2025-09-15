@@ -133,6 +133,9 @@ export const appointmentRouter = createTRPCRouter({
           service: true,
           room: true,
         },
+        orderBy: {
+          startAt: "asc",
+        },
       });
     }),
 
