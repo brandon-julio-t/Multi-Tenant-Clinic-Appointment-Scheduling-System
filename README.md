@@ -159,7 +159,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 # Trade-offs
 
 - In `getAvailableTimeSlotsForCreateAppointment`, `limit` is not used, but can be extended in the future, because the time slots have been bound to just single day and adding limit logic would make the code to be convoluted with no clear benefit at the point of writing. Also, the user cannot schedule an appointment in the afternoon, due to this limitation. Hence, because the `limit` parameter has more cons than the pros, it is omitted for now.
-- For testing, the database is not mocked to match real-life scenario and ensure no concurrency problem occurs. Hence, database seed is very improtant when testing.
+- For testing, the database is not mocked to match real-life scenario and ensure no concurrency problem occurs. Hence, database seed is very important when testing.
 - For OpenAPI, the authorization for now is hardcoded according to seed data, so it is important to setup the database with the data seed, because the primary development is using tRPC and writing OpenAPI only slows down development velocity. Hence, the OpenAPI is done in bare minimum manner.
 - For timezone, we setup `appTimezone` from the user's active organization, so that everybody in the organization will see the same time display, no matter whether they work on-site according to the timezone or remote in country far far away with different timezone. The consequence is we need to always consider timezone when doing date manipulation/creation, but this is already handled by using `{ in: tz(timezone) }` options in date-fns.
 
@@ -171,7 +171,7 @@ The algorithm to generate available time slots is relatively basic, traverse the
 
 The app should scale well horizontally, we can just deploy it using PM2 in a traditional VPS like EC2, load balancing should not be a problem since we're not doing anything sophisticated in-memory.
 
-PostgresSQL also should be able to handle the workload, considering the well-placed index and all queries have been checked to be using the index.
+PostgreSQL also should be able to handle the workload, considering the well-placed index and all queries have been checked to be using the index.
 
 If we take the assumptions of 50k bookings/day and peak traffic of 09:00-11:00, we can calculate that there are around ~1 bookings per second (actual value is 0.58).
 

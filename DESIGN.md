@@ -22,7 +22,7 @@ The algorithm to generate available time slots is relatively basic, traverse the
 
 The app should scale well horizontally, we can just deploy it using PM2 in a traditional VPS like EC2, load balancing should not be a problem since we're not doing anything sophisticated in-memory.
 
-PostgresSQL also should be able to handle the workload, considering the well-placed index and all queries have been checked to be using the index.
+PostgreSQL also should be able to handle the workload, considering the well-placed index and all queries have been checked to be using the index.
 
 If we take the assumptions of 50k bookings/day and peak traffic of 09:00-11:00, we can calculate that there are around ~1 bookings per second (actual value is 0.58).
 
