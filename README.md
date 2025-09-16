@@ -115,15 +115,15 @@ The app uses Better Auth for authentication with email/password login and organi
 
 Sample users created by the seed script:
 
-**Main Street Medical Clinic:**
+**City Medical Organization:**
 
-- Admin: `sarah.johnson@mainstreetclinic.com` / `password123`
-- Staff: `emily.rodriguez@mainstreetclinic.com` / `password123`
+- Admin: `sarah.johnson@citymedical.com` / `password123`
+- Staff: `emily.rodriguez@citymedical.com` / `password123`
 
-**General Hospital:**
+**Family Practice Organization:**
 
-- Admin: `michael.chen@generalhospital.com` / `password123`
-- Staff: `david.kim@generalhospital.com` / `password123`
+- Admin: `michael.chen@familypractice.com` / `password123`
+- Staff: `james.wilson@familypractice.com` / `password123`
 
 The seed script uses Better Auth's organization plugin API to properly create:
 
