@@ -1,0 +1,1721 @@
+{
+	"info": {
+		"_postman_id": "e0b8838e-93b1-458d-953f-359cb2f03a31",
+		"name": "tRPC OpenAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14360137"
+	},
+	"item": [
+		{
+			"name": "appointments",
+			"item": [
+				{
+					"name": "appointment-get Appointments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments?from=2025-08-31T22:00:00.000Z&to=2025-09-30T21:59:59.999Z",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2025-08-31T22:00:00.000Z",
+									"description": "(Required) Example: 2025-08-31T22:00:00.000Z"
+								},
+								{
+									"key": "to",
+									"value": "2025-09-30T21:59:59.999Z",
+									"description": "(Required) Example: 2025-09-30T21:59:59.999Z"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=string&to=string",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"id\": \"string\",\n    \"doctor\": {\n      \"id\": \"string\",\n      \"name\": \"string\"\n    },\n    \"service\": {\n      \"id\": \"string\",\n      \"name\": \"string\"\n    },\n    \"room\": {\n      \"id\": \"string\",\n      \"name\": \"string\"\n    },\n    \"startAt\": \"string\",\n    \"endAt\": \"string\",\n    \"createdAt\": \"string\",\n    \"updatedAt\": \"string\"\n  },\n  {\n    \"id\": \"string\",\n    \"doctor\": {\n      \"id\": \"string\",\n      \"name\": \"string\"\n    },\n    \"service\": {\n      \"id\": \"string\",\n      \"name\": \"string\"\n    },\n    \"room\": {\n      \"id\": \"string\",\n      \"name\": \"string\"\n    },\n    \"startAt\": \"string\",\n    \"endAt\": \"string\",\n    \"createdAt\": \"string\",\n    \"updatedAt\": \"string\"\n  }\n]"
+						},
+						{
+							"name": "Invalid input data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=string&to=string",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"BAD_REQUEST\",\n  \"message\": \"Invalid input data\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Authorization not provided",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=string&to=string",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"UNAUTHORIZED\",\n  \"message\": \"Authorization not provided\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Insufficient access",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=string&to=string",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"FORBIDDEN\",\n  \"message\": \"Insufficient access\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Not found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=string&to=string",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"NOT_FOUND\",\n  \"message\": \"Not found\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Internal server error",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=string&to=string",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"INTERNAL_SERVER_ERROR\",\n  \"message\": \"Internal server error\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "appointment-get Appointments",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments?from=2025-08-31T22:00:00.000Z&to=2025-09-30T21:59:59.999Z",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "2025-08-31T22:00:00.000Z",
+											"description": "(Required) Example: 2025-08-31T22:00:00.000Z"
+										},
+										{
+											"key": "to",
+											"value": "2025-09-30T21:59:59.999Z",
+											"description": "(Required) Example: 2025-09-30T21:59:59.999Z"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "vary",
+									"value": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 16 Sep 2025 12:28:19 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": \"e56d8f6f-17b4-430e-8f78-6a9b5b9a42a0\",\n        \"doctor\": {\n            \"id\": \"doctor_robert_miller\",\n            \"name\": \"Dr. Robert Miller\"\n        },\n        \"service\": {\n            \"id\": \"service_orthopedics\",\n            \"name\": \"Orthopedics\"\n        },\n        \"room\": {\n            \"id\": \"ccec0dbb-d169-4bb5-95dc-83081655da7d\",\n            \"name\": \"Ultrasound Room 967\"\n        },\n        \"startAt\": \"2025-09-05T05:45:00.000Z\",\n        \"endAt\": \"2025-09-05T07:00:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.279Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.279Z\"\n    },\n    {\n        \"id\": \"63e8a343-28d6-4d1d-a066-dcf70a29313b\",\n        \"doctor\": {\n            \"id\": \"doctor_robert_miller\",\n            \"name\": \"Dr. Robert Miller\"\n        },\n        \"service\": {\n            \"id\": \"service_general_checkup\",\n            \"name\": \"General Checkup\"\n        },\n        \"room\": {\n            \"id\": \"room_mc_102\",\n            \"name\": \"Room 102\"\n        },\n        \"startAt\": \"2025-09-05T07:15:00.000Z\",\n        \"endAt\": \"2025-09-05T07:45:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.283Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.283Z\"\n    },\n    {\n        \"id\": \"96212783-dc00-4a31-af15-5ec5694eafb2\",\n        \"doctor\": {\n            \"id\": \"doctor_robert_miller\",\n            \"name\": \"Dr. Robert Miller\"\n        },\n        \"service\": {\n            \"id\": \"service_cardiology\",\n            \"name\": \"Cardiology Consultation\"\n        },\n        \"room\": {\n            \"id\": \"e1eda764-4894-4341-97ca-bf9fbeeab875\",\n            \"name\": \"Examination Room 200\"\n        },\n        \"startAt\": \"2025-09-06T08:30:00.000Z\",\n        \"endAt\": \"2025-09-06T09:45:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.331Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.331Z\"\n    },\n    {\n        \"id\": \"9ff2f69e-79a8-4c58-9057-c08016191e61\",\n        \"doctor\": {\n            \"id\": \"dff97363-e828-494f-9364-40b597e9a6c7\",\n            \"name\": \"Dr. Rodrick Medhurst\"\n        },\n        \"service\": {\n            \"id\": \"84e2217d-7d7b-4223-a2e7-993a53987437\",\n            \"name\": \"Fertility Services\"\n        },\n        \"room\": {\n            \"id\": \"bcf7bdda-0c70-4e48-b0ec-626a01fbce44\",\n            \"name\": \"Office 276\"\n        },\n        \"startAt\": \"2025-09-06T09:45:00.000Z\",\n        \"endAt\": \"2025-09-06T10:00:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.226Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.226Z\"\n    },\n    {\n        \"id\": \"b6b13b6d-d60a-4a02-baa8-699ae76021af\",\n        \"doctor\": {\n            \"id\": \"doctor_emily_davis\",\n            \"name\": \"Dr. Emily Davis\"\n        },\n        \"service\": {\n            \"id\": \"service_dermatology\",\n            \"name\": \"Dermatology\"\n        },\n        \"room\": {\n            \"id\": \"room_mc_101\",\n            \"name\": \"Room 101\"\n        },\n        \"startAt\": \"2025-09-11T03:00:00.000Z\",\n        \"endAt\": \"2025-09-11T04:45:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.311Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.311Z\"\n    },\n    {\n        \"id\": \"dc97656a-3912-4d08-819f-f8711fdad636\",\n        \"doctor\": {\n            \"id\": \"28d6d3fa-abf8-4360-b522-7639d0832f4f\",\n            \"name\": \"Dr. Valentina Schinner\"\n        },\n        \"service\": {\n            \"id\": \"service_pediatrics\",\n            \"name\": \"Pediatrics\"\n        },\n        \"room\": {\n            \"id\": \"e1eda764-4894-4341-97ca-bf9fbeeab875\",\n            \"name\": \"Examination Room 200\"\n        },\n        \"startAt\": \"2025-09-17T07:00:00.000Z\",\n        \"endAt\": \"2025-09-17T09:00:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.224Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.224Z\"\n    },\n    {\n        \"id\": \"b03df8af-c223-46bd-aeed-cc461561bb8f\",\n        \"doctor\": {\n            \"id\": \"28d6d3fa-abf8-4360-b522-7639d0832f4f\",\n            \"name\": \"Dr. Valentina Schinner\"\n        },\n        \"service\": {\n            \"id\": \"6a10d513-d088-48b4-9930-d6b1261e5ed4\",\n            \"name\": \"Trauma Surgery\"\n        },\n        \"room\": {\n            \"id\": \"bcf7bdda-0c70-4e48-b0ec-626a01fbce44\",\n            \"name\": \"Office 276\"\n        },\n        \"startAt\": \"2025-09-17T10:00:00.000Z\",\n        \"endAt\": \"2025-09-17T10:15:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.242Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.242Z\"\n    },\n    {\n        \"id\": \"01K597Y53EVA3M7D1D790GHZCF\",\n        \"doctor\": {\n            \"id\": \"1a4353a6-a79d-4056-8a8b-5e28c538f7c1\",\n            \"name\": \"Dr. Demarcus Lueilwitz\"\n        },\n        \"service\": {\n            \"id\": \"service_cardiology\",\n            \"name\": \"Cardiology Consultation\"\n        },\n        \"room\": {\n            \"id\": \"97013d9c-52d6-4607-af0d-ae87c205c6b6\",\n            \"name\": \"Emergency Room 433\"\n        },\n        \"startAt\": \"2025-09-19T14:45:00.000Z\",\n        \"endAt\": \"2025-09-19T15:30:00.000Z\",\n        \"createdAt\": \"2025-09-16T12:28:04.079Z\",\n        \"updatedAt\": \"2025-09-16T12:28:04.079Z\"\n    },\n    {\n        \"id\": \"01K56TNCJCEWP8K9DBMB3K48WT\",\n        \"doctor\": {\n            \"id\": \"1a4353a6-a79d-4056-8a8b-5e28c538f7c1\",\n            \"name\": \"Dr. Demarcus Lueilwitz\"\n        },\n        \"service\": {\n            \"id\": \"service_cardiology\",\n            \"name\": \"Cardiology Consultation\"\n        },\n        \"room\": {\n            \"id\": \"97013d9c-52d6-4607-af0d-ae87c205c6b6\",\n            \"name\": \"Emergency Room 433\"\n        },\n        \"startAt\": \"2025-09-19T17:45:00.000Z\",\n        \"endAt\": \"2025-09-19T18:30:00.000Z\",\n        \"createdAt\": \"2025-09-15T13:57:36.460Z\",\n        \"updatedAt\": \"2025-09-15T13:57:36.460Z\"\n    },\n    {\n        \"id\": \"01K56SCPEG085GB588EG7MEJ6M\",\n        \"doctor\": {\n            \"id\": \"1a4353a6-a79d-4056-8a8b-5e28c538f7c1\",\n            \"name\": \"Dr. Demarcus Lueilwitz\"\n        },\n        \"service\": {\n            \"id\": \"service_cardiology\",\n            \"name\": \"Cardiology Consultation\"\n        },\n        \"room\": {\n            \"id\": \"e1eda764-4894-4341-97ca-bf9fbeeab875\",\n            \"name\": \"Examination Room 200\"\n        },\n        \"startAt\": \"2025-09-19T20:45:00.000Z\",\n        \"endAt\": \"2025-09-19T21:30:00.000Z\",\n        \"createdAt\": \"2025-09-15T13:35:23.088Z\",\n        \"updatedAt\": \"2025-09-15T13:35:23.088Z\"\n    },\n    {\n        \"id\": \"b9ab7178-cca3-4885-a6c9-cc4282d262bc\",\n        \"doctor\": {\n            \"id\": \"doctor_sarah_johnson\",\n            \"name\": \"Dr. Sarah Johnson\"\n        },\n        \"service\": {\n            \"id\": \"service_orthopedics\",\n            \"name\": \"Orthopedics\"\n        },\n        \"room\": {\n            \"id\": \"934590b9-89eb-4853-8662-adbb3516689b\",\n            \"name\": \"Supply Room 928\"\n        },\n        \"startAt\": \"2025-09-26T06:45:00.000Z\",\n        \"endAt\": \"2025-09-26T07:45:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.273Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.273Z\"\n    },\n    {\n        \"id\": \"31110fce-374a-46af-bdae-66cf26893d77\",\n        \"doctor\": {\n            \"id\": \"28d6d3fa-abf8-4360-b522-7639d0832f4f\",\n            \"name\": \"Dr. Valentina Schinner\"\n        },\n        \"service\": {\n            \"id\": \"service_dermatology\",\n            \"name\": \"Dermatology\"\n        },\n        \"room\": {\n            \"id\": \"room_mc_103\",\n            \"name\": \"Room 103\"\n        },\n        \"startAt\": \"2025-09-28T07:15:00.000Z\",\n        \"endAt\": \"2025-09-28T07:30:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.311Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.311Z\"\n    },\n    {\n        \"id\": \"94dee589-3c33-4d4f-ae08-e9d0d62bb2cc\",\n        \"doctor\": {\n            \"id\": \"dff97363-e828-494f-9364-40b597e9a6c7\",\n            \"name\": \"Dr. Rodrick Medhurst\"\n        },\n        \"service\": {\n            \"id\": \"6a10d513-d088-48b4-9930-d6b1261e5ed4\",\n            \"name\": \"Trauma Surgery\"\n        },\n        \"room\": {\n            \"id\": \"ccec0dbb-d169-4bb5-95dc-83081655da7d\",\n            \"name\": \"Ultrasound Room 967\"\n        },\n        \"startAt\": \"2025-09-29T02:30:00.000Z\",\n        \"endAt\": \"2025-09-29T02:45:00.000Z\",\n        \"createdAt\": \"2025-09-15T12:49:34.225Z\",\n        \"updatedAt\": \"2025-09-15T12:49:34.225Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "appointment-create Appointment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"doctorId\": \"1a4353a6-a79d-4056-8a8b-5e28c538f7c1\",\n  \"serviceId\": \"service_cardiology\",\n  \"roomId\": \"97013d9c-52d6-4607-af0d-ae87c205c6b6\",\n  \"patientId\": \"4f8faf1a-64f9-440f-b81f-5917a497c621\",\n  \"deviceIds\": [\"device_mc_blood_pressure\"],\n  \"startAt\": \"2025-09-19T14:45:00.000Z\",\n  \"endAt\": \"2025-09-19T15:30:00.000Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/appointments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"string\",\n  \"serviceId\": \"string\",\n  \"roomId\": \"string\",\n  \"patientId\": \"string\",\n  \"deviceIds\": [\n    \"string\"\n  ],\n  \"startAt\": \"string\",\n  \"endAt\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"string\"\n}"
+						},
+						{
+							"name": "Invalid input data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"string\",\n  \"serviceId\": \"string\",\n  \"roomId\": \"string\",\n  \"patientId\": \"string\",\n  \"deviceIds\": [\n    \"string\"\n  ],\n  \"startAt\": \"string\",\n  \"endAt\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"BAD_REQUEST\",\n  \"message\": \"Invalid input data\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Authorization not provided",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"string\",\n  \"serviceId\": \"string\",\n  \"roomId\": \"string\",\n  \"patientId\": \"string\",\n  \"deviceIds\": [\n    \"string\"\n  ],\n  \"startAt\": \"string\",\n  \"endAt\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"UNAUTHORIZED\",\n  \"message\": \"Authorization not provided\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Insufficient access",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"string\",\n  \"serviceId\": \"string\",\n  \"roomId\": \"string\",\n  \"patientId\": \"string\",\n  \"deviceIds\": [\n    \"string\"\n  ],\n  \"startAt\": \"string\",\n  \"endAt\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"FORBIDDEN\",\n  \"message\": \"Insufficient access\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Internal server error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"string\",\n  \"serviceId\": \"string\",\n  \"roomId\": \"string\",\n  \"patientId\": \"string\",\n  \"deviceIds\": [\n    \"string\"\n  ],\n  \"startAt\": \"string\",\n  \"endAt\": \"string\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"INTERNAL_SERVER_ERROR\",\n  \"message\": \"Internal server error\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "appointment-create Appointment",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"1a4353a6-a79d-4056-8a8b-5e28c538f7c1\",\n  \"serviceId\": \"service_cardiology\",\n  \"roomId\": \"97013d9c-52d6-4607-af0d-ae87c205c6b6\",\n  \"patientId\": \"4f8faf1a-64f9-440f-b81f-5917a497c621\",\n  \"deviceIds\": [\"device_mc_blood_pressure\"],\n  \"startAt\": \"2025-09-19T14:45:00.000Z\",\n  \"endAt\": \"2025-09-19T15:30:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "vary",
+									"value": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 16 Sep 2025 12:28:04 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"01K597Y53EVA3M7D1D790GHZCF\"\n}"
+						},
+						{
+							"name": "appointment-create Appointment",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"doctorId\": \"1a4353a6-a79d-4056-8a8b-5e28c538f7c1\",\n  \"serviceId\": \"service_cardiology\",\n  \"roomId\": \"97013d9c-52d6-4607-af0d-ae87c205c6b6\",\n  \"patientId\": \"4f8faf1a-64f9-440f-b81f-5917a497c621\",\n  \"deviceIds\": [\"device_mc_blood_pressure\"],\n  \"startAt\": \"2025-09-19T14:45:00.000Z\",\n  \"endAt\": \"2025-09-19T15:30:00.000Z\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/appointments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "vary",
+									"value": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 16 Sep 2025 12:30:39 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Room is already booked for this time\",\n    \"code\": \"CONFLICT\",\n    \"data\": {\n        \"code\": \"CONFLICT\",\n        \"httpStatus\": 409,\n        \"stack\": \"TRPCError: Room is already booked for this time\\n    at /Users/brandonthenaro/repos/Multi-Tenant-Clinic-Appointment-Scheduling-System/.next/server/chunks/[root-of-the-server]__965eae81._.js:473:23\\n    at Array.forEach (<anonymous>)\\n    at /Users/brandonthenaro/repos/Multi-Tenant-Clinic-Appointment-Scheduling-System/.next/server/chunks/[root-of-the-server]__965eae81._.js:458:28\\n    at async Proxy._transactionWithCallback (/Users/brandonthenaro/repos/Multi-Tenant-Clinic-Appointment-Scheduling-System/node_modules/@prisma/client/runtime/library.js:130:8120)\",\n        \"path\": \"appointment.createAppointment\",\n        \"zodError\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "appointment-get Available Time Slots For Create Appointment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments/availability?roomId=97013d9c-52d6-4607-af0d-ae87c205c6b6&doctorId=1a4353a6-a79d-4056-8a8b-5e28c538f7c1&serviceId=service_cardiology&from=2025-09-18T22:00:00.000Z&to=2025-09-19T21:59:59.999Z&limit=3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								"availability"
+							],
+							"query": [
+								{
+									"key": "roomId",
+									"value": "97013d9c-52d6-4607-af0d-ae87c205c6b6",
+									"description": "(Required) Example: 97013d9c-52d6-4607-af0d-ae87c205c6b6"
+								},
+								{
+									"key": "doctorId",
+									"value": "1a4353a6-a79d-4056-8a8b-5e28c538f7c1",
+									"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+								},
+								{
+									"key": "serviceId",
+									"value": "service_cardiology",
+									"description": "(Required) Example: service_cardiology"
+								},
+								{
+									"key": "from",
+									"value": "2025-09-18T22:00:00.000Z",
+									"description": "(Required) Example: 2025-09-18T22:00:00.000Z"
+								},
+								{
+									"key": "to",
+									"value": "2025-09-19T21:59:59.999Z",
+									"description": "(Required) Example: 2025-09-19T21:59:59.999Z"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=string&doctorId=string&serviceId=string&from=string&to=string&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "string"
+										},
+										{
+											"key": "doctorId",
+											"value": "string"
+										},
+										{
+											"key": "serviceId",
+											"value": "string"
+										},
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"start\": \"string\",\n    \"end\": \"string\",\n    \"disabled\": true,\n    \"disabledReason\": \"string\"\n  },\n  {\n    \"start\": \"string\",\n    \"end\": \"string\",\n    \"disabled\": true,\n    \"disabledReason\": \"string\"\n  }\n]"
+						},
+						{
+							"name": "Invalid input data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=string&doctorId=string&serviceId=string&from=string&to=string&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "string"
+										},
+										{
+											"key": "doctorId",
+											"value": "string"
+										},
+										{
+											"key": "serviceId",
+											"value": "string"
+										},
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"BAD_REQUEST\",\n  \"message\": \"Invalid input data\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Authorization not provided",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=string&doctorId=string&serviceId=string&from=string&to=string&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "string"
+										},
+										{
+											"key": "doctorId",
+											"value": "string"
+										},
+										{
+											"key": "serviceId",
+											"value": "string"
+										},
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"UNAUTHORIZED\",\n  \"message\": \"Authorization not provided\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Insufficient access",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=string&doctorId=string&serviceId=string&from=string&to=string&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "string"
+										},
+										{
+											"key": "doctorId",
+											"value": "string"
+										},
+										{
+											"key": "serviceId",
+											"value": "string"
+										},
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"FORBIDDEN\",\n  \"message\": \"Insufficient access\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Not found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=string&doctorId=string&serviceId=string&from=string&to=string&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "string"
+										},
+										{
+											"key": "doctorId",
+											"value": "string"
+										},
+										{
+											"key": "serviceId",
+											"value": "string"
+										},
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"NOT_FOUND\",\n  \"message\": \"Not found\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Internal server error",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=string&doctorId=string&serviceId=string&from=string&to=string&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "string"
+										},
+										{
+											"key": "doctorId",
+											"value": "string"
+										},
+										{
+											"key": "serviceId",
+											"value": "string"
+										},
+										{
+											"key": "from",
+											"value": "string"
+										},
+										{
+											"key": "to",
+											"value": "string"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"INTERNAL_SERVER_ERROR\",\n  \"message\": \"Internal server error\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "appointment-get Available Time Slots For Create Appointment",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/availability?roomId=97013d9c-52d6-4607-af0d-ae87c205c6b6&doctorId=1a4353a6-a79d-4056-8a8b-5e28c538f7c1&serviceId=service_cardiology&from=2025-09-18T22:00:00.000Z&to=2025-09-19T21:59:59.999Z&limit=3",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										"availability"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "97013d9c-52d6-4607-af0d-ae87c205c6b6",
+											"description": "(Required) Example: 97013d9c-52d6-4607-af0d-ae87c205c6b6"
+										},
+										{
+											"key": "doctorId",
+											"value": "1a4353a6-a79d-4056-8a8b-5e28c538f7c1",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										},
+										{
+											"key": "serviceId",
+											"value": "service_cardiology",
+											"description": "(Required) Example: service_cardiology"
+										},
+										{
+											"key": "from",
+											"value": "2025-09-18T22:00:00.000Z",
+											"description": "(Required) Example: 2025-09-18T22:00:00.000Z"
+										},
+										{
+											"key": "to",
+											"value": "2025-09-19T21:59:59.999Z",
+											"description": "(Required) Example: 2025-09-19T21:59:59.999Z"
+										},
+										{
+											"key": "limit",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "vary",
+									"value": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 16 Sep 2025 12:28:43 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"start\": \"2025-09-19T08:30:00.000+02:00\",\n        \"end\": \"2025-09-19T09:15:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T09:15:00.000+02:00\",\n        \"end\": \"2025-09-19T10:00:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T10:00:00.000+02:00\",\n        \"end\": \"2025-09-19T10:45:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T10:45:00.000+02:00\",\n        \"end\": \"2025-09-19T11:30:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T11:30:00.000+02:00\",\n        \"end\": \"2025-09-19T12:15:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T12:15:00.000+02:00\",\n        \"end\": \"2025-09-19T13:00:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T13:00:00.000+02:00\",\n        \"end\": \"2025-09-19T13:45:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T13:45:00.000+02:00\",\n        \"end\": \"2025-09-19T14:30:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T14:30:00.000+02:00\",\n        \"end\": \"2025-09-19T15:15:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T15:15:00.000+02:00\",\n        \"end\": \"2025-09-19T16:00:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T16:00:00.000+02:00\",\n        \"end\": \"2025-09-19T16:45:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T16:45:00.000+02:00\",\n        \"end\": \"2025-09-19T17:30:00.000+02:00\",\n        \"disabled\": true,\n        \"disabledReason\": \"Time slot booked\"\n    },\n    {\n        \"start\": \"2025-09-19T17:30:00.000+02:00\",\n        \"end\": \"2025-09-19T18:15:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T18:15:00.000+02:00\",\n        \"end\": \"2025-09-19T19:00:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T19:00:00.000+02:00\",\n        \"end\": \"2025-09-19T19:45:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T19:45:00.000+02:00\",\n        \"end\": \"2025-09-19T20:30:00.000+02:00\",\n        \"disabled\": true,\n        \"disabledReason\": \"Time slot booked\"\n    },\n    {\n        \"start\": \"2025-09-19T20:30:00.000+02:00\",\n        \"end\": \"2025-09-19T21:15:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T21:15:00.000+02:00\",\n        \"end\": \"2025-09-19T22:00:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T22:00:00.000+02:00\",\n        \"end\": \"2025-09-19T22:45:00.000+02:00\",\n        \"disabled\": false,\n        \"disabledReason\": \"\"\n    },\n    {\n        \"start\": \"2025-09-19T22:45:00.000+02:00\",\n        \"end\": \"2025-09-19T23:30:00.000+02:00\",\n        \"disabled\": true,\n        \"disabledReason\": \"Time slot booked\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "appointment-delete Appointment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{bearerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "01K597Y53EVA3M7D1D790GHZCF"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Successful response",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"string\"\n}"
+						},
+						{
+							"name": "Invalid input data",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"BAD_REQUEST\",\n  \"message\": \"Invalid input data\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Authorization not provided",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"UNAUTHORIZED\",\n  \"message\": \"Authorization not provided\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Insufficient access",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"FORBIDDEN\",\n  \"message\": \"Insufficient access\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Not found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"NOT_FOUND\",\n  \"message\": \"Not found\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "Internal server error",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <token>",
+										"description": "Added as a part of security scheme: bearer"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "(Required) Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"code\": \"INTERNAL_SERVER_ERROR\",\n  \"message\": \"Internal server error\",\n  \"issues\": []\n}"
+						},
+						{
+							"name": "appointment-delete Appointment",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/appointments/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "01K597Y53EVA3M7D1D790GHZCF"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [
+								{
+									"key": "vary",
+									"value": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 16 Sep 2025 12:29:23 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"01K597Y53EVA3M7D1D790GHZCF\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		}
+	]
+}

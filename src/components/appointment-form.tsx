@@ -127,7 +127,6 @@ export function AppointmentForm() {
 
   const onSubmit = async (data: AppointmentFormData) => {
     console.log("Form data:", data);
-    // TODO: Implement appointment creation logic
 
     const [startHour, startMinute] = data.startTime.split(":");
     const [endHour, endMinute] = data.endTime.split(":");

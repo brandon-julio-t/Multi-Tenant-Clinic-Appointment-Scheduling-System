@@ -35,6 +35,8 @@ export const createTRPCContext = async (opts: {
   });
 
   if (opts.openapi && t._config.isDev) {
+    // NOTE: since we're using tRPC, the OpenAPI / REST API is only for Postman, not to be used in production settings.
+
     const [mockSession, mockUser] = await db.$transaction([
       db.session.findFirst({
         where: { userId: "user_admin_1" },

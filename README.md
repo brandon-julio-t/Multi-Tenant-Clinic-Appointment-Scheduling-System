@@ -51,20 +51,16 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
    NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
    ```
 
-4. **Set up the database**
+4. **Set up Infrastructure**
 
    ```bash
-   # Generate Prisma client
-   npm run db:generate
-
-   # Push schema to database
-   npm run db:push
+   docker compose up -d
    ```
 
-5. **Seed the database with sample data**
+5. **Set up and seed the database with sample data**
 
    ```bash
-   npm run db:seed
+   npm run db:reset
    ```
 
    This will create:
@@ -74,6 +70,8 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
    - 4 doctors, 4 patients
    - Services, rooms, and medical devices
    - Sample appointments with device associations
+
+   There also exist `./dev/backup.sql` for convenience of setting up the database with seed data with only using SQL.
 
 ### Development
 
@@ -92,7 +90,7 @@ npm run db:studio
 - `npm run start` - Start production server
 - `npm run db:generate` - Generate Prisma client
 - `npm run db:push` - Push schema changes to database
-- `npm run db:seed` - Seed database with sample data
+- `npm run db:reset` - Reset and seed database with sample data
 - `npm run db:studio` - Open Prisma Studio
 - `npm run lint` - Run ESLint
 - `npm run typecheck` - Run TypeScript type checking
@@ -134,6 +132,10 @@ The seed script uses Better Auth's organization plugin API to properly create:
 - Organization members using `authClient.organization.addMember()`
 
 This ensures that all authentication data is correctly structured and users can successfully log in with proper organization membership.
+
+## Postman
+
+There is a file in `./dev/tRPC OpenAPI.postman_collection.json` that can be imported into Postman for REST API development style.
 
 ## Deployment
 

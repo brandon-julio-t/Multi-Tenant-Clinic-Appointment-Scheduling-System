@@ -99,6 +99,7 @@ export const appointmentRouter = createTRPCRouter({
   }),
 
   // Fetch all appointments
+  // GET /api/doctors/:id/schedule?from=...&to=... — list doctor’s appointments for calendar view
   getAppointments: protectedOrgProcedure
     .meta({
       openapi: {
@@ -164,6 +165,7 @@ export const appointmentRouter = createTRPCRouter({
       });
     }),
 
+  // GET /api/availability — search availability (see payload below)
   getAvailableTimeSlotsForCreateAppointment: protectedOrgProcedure
     .meta({
       openapi: {
@@ -312,6 +314,7 @@ export const appointmentRouter = createTRPCRouter({
     }),
 
   // Create a new appointment
+  // POST /api/appointments — create booking
   createAppointment: protectedOrgProcedure
     .meta({
       openapi: {
@@ -337,6 +340,7 @@ export const appointmentRouter = createTRPCRouter({
       return output;
     }),
 
+  // DELETE /api/appointments/:id — cancel booking
   deleteAppointment: protectedOrgProcedure
     .meta({
       openapi: {
