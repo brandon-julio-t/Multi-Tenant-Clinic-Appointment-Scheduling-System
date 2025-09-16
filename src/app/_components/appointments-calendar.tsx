@@ -1,6 +1,7 @@
 "use client";
 
 import { tz } from "@date-fns/tz";
+import type { Appointment } from "@prisma/client";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
   areIntervalsOverlapping,
@@ -13,10 +14,23 @@ import {
 } from "date-fns";
 import { Loader2Icon } from "lucide-react";
 import React from "react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import {
   Card,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -213,11 +227,77 @@ function AppointmentsByDaySheetContent({
                     {format(appointment.endAt, "pppp", { in: tz(timezone) })}
                   </CardDescription>
                 </CardHeader>
+
+                <CardFooter>
+                  <DeleteAppointmentButton appointment={appointment} />
+                </CardFooter>
               </Card>
             ))
           )}
         </div>
       </section>
     </>
+  );
+}
+
+function DeleteAppointmentButton({
+  appointment,
+}: {
+  appointment: Pick<Appointment, "id">;
+}) {
+  const utils = api.useUtils();
+
+  const deleteAppointmentMutation =
+    api.appointment.deleteAppointment.useMutation({
+      onSuccess: async () => {
+        await utils.appointment.getAppointments.invalidate();
+        await utils.appointment.getAvailableTimeSlotsForCreateAppointment.invalidate();
+      },
+    });
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="destructive"
+          size="sm"
+          disabled={deleteAppointmentMutation.isPending}
+        >
+          {deleteAppointmentMutation.isPending && (
+            <Loader2Icon className="animate-spin" />
+          )}
+          {deleteAppointmentMutation.isPending ? "Deleting..." : "Delete"}
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Appointment</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete this appointment?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            disabled={deleteAppointmentMutation.isPending}
+            onClick={() => {
+              toast.promise(
+                deleteAppointmentMutation.mutateAsync({ id: appointment.id }),
+                {
+                  loading: "Deleting appointment...",
+                  success: "Appointment deleted successfully",
+                  error: "Failed to delete appointment",
+                },
+              );
+            }}
+          >
+            {deleteAppointmentMutation.isPending && (
+              <Loader2Icon className="animate-spin" />
+            )}
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

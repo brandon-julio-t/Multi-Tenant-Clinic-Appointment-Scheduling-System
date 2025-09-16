@@ -100,12 +100,41 @@ export const appointmentRouter = createTRPCRouter({
 
   // Fetch all appointments
   getAppointments: protectedOrgProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/appointments",
+        tags: ["appointments"],
+      },
+    })
     .input(
       z.object({
-        roomId: z.string().nullish(),
-        from: z.date(),
-        to: z.date(),
+        from: z.date().describe("Example: 2025-08-31T22:00:00.000Z"),
+        to: z.date().describe("Example: 2025-09-30T21:59:59.999Z"),
       }),
+    )
+    .output(
+      z.array(
+        z.object({
+          id: z.string(),
+          doctor: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+          service: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+          room: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+          startAt: z.date(),
+          endAt: z.date(),
+          createdAt: z.date(),
+          updatedAt: z.date(),
+        }),
+      ),
     )
     .query(async ({ ctx, input }) => {
       console.log("input", input);
@@ -117,10 +146,6 @@ export const appointmentRouter = createTRPCRouter({
           endAt: { lte: input.to },
         },
       ];
-
-      if (input.roomId) {
-        whereAnd.push({ roomId: input.roomId });
-      }
 
       console.log("whereAnd", whereAnd);
 
@@ -140,15 +165,36 @@ export const appointmentRouter = createTRPCRouter({
     }),
 
   getAvailableTimeSlotsForCreateAppointment: protectedOrgProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/appointments/availability",
+        tags: ["appointments"],
+      },
+    })
     .input(
       z.object({
-        roomId: z.string(),
-        doctorId: z.string(),
-        serviceId: z.string(),
-        from: z.date(),
-        to: z.date(),
-        limit: z.number().optional().default(3),
+        roomId: z
+          .string()
+          .describe("Example: 97013d9c-52d6-4607-af0d-ae87c205c6b6"),
+        doctorId: z
+          .string()
+          .describe("Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"),
+        serviceId: z.string().describe("Example: service_cardiology"),
+        from: z.date().describe("Example: 2025-09-18T22:00:00.000Z"),
+        to: z.date().describe("Example: 2025-09-19T21:59:59.999Z"),
+        limit: z.number().optional().default(3).describe("Example: 3"),
       }),
+    )
+    .output(
+      z.array(
+        z.object({
+          start: z.date(),
+          end: z.date(),
+          disabled: z.boolean(),
+          disabledReason: z.string().optional(),
+        }),
+      ),
     )
     .query(async ({ ctx, input }) => {
       console.log("input", input);
@@ -267,7 +313,15 @@ export const appointmentRouter = createTRPCRouter({
 
   // Create a new appointment
   createAppointment: protectedOrgProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/appointments",
+        tags: ["appointments"],
+      },
+    })
     .input(createAppointmentInputSchema)
+    .output(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       console.log("input", input);
 
@@ -281,5 +335,36 @@ export const appointmentRouter = createTRPCRouter({
       console.log("output", output);
 
       return output;
+    }),
+
+  deleteAppointment: protectedOrgProcedure
+    .meta({
+      openapi: {
+        method: "DELETE",
+        path: "/appointments/{id}",
+        tags: ["appointments"],
+      },
+    })
+    .input(
+      z.object({
+        id: z
+          .string()
+          .describe("Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"),
+      }),
+    )
+    .output(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      console.log("input", input);
+
+      const deleted = await ctx.db.appointment.delete({
+        where: {
+          id: input.id,
+          organizationId: ctx.activeOrganizationId,
+        },
+      });
+
+      console.log("deleted", deleted);
+
+      return deleted;
     }),
 });

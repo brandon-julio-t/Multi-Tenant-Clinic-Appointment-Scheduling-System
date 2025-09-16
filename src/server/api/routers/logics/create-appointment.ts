@@ -5,13 +5,25 @@ import { areIntervalsOverlapping, endOfDay, startOfDay } from "date-fns";
 import z from "zod";
 
 export const createAppointmentInputSchema = z.object({
-  doctorId: z.string().nonempty(),
-  serviceId: z.string().nonempty(),
-  roomId: z.string().nonempty(),
-  patientId: z.string().nonempty(),
-  deviceIds: z.array(z.string().nonempty()).nonempty(),
-  startAt: z.date(),
-  endAt: z.date(),
+  doctorId: z
+    .string()
+    .nonempty()
+    .describe("Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"),
+  serviceId: z.string().nonempty().describe("Example: service_cardiology"),
+  roomId: z
+    .string()
+    .nonempty()
+    .describe("Example: 97013d9c-52d6-4607-af0d-ae87c205c6b6"),
+  patientId: z
+    .string()
+    .nonempty()
+    .describe("Example: 1a4353a6-a79d-4056-8a8b-5e28c538f7c1"),
+  deviceIds: z
+    .array(z.string().nonempty())
+    .nonempty()
+    .describe("Example: [1a4353a6-a79d-4056-8a8b-5e28c538f7c1]"),
+  startAt: z.date().describe("Example: 2025-09-18T22:00:00.000Z"),
+  endAt: z.date().describe("Example: 2025-09-18T22:30:00.000Z"),
 });
 
 export async function createAppointment({

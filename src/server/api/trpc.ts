@@ -8,10 +8,10 @@
  */
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
+import { type OpenApiMeta } from "trpc-to-openapi";
 import { ZodError } from "zod";
-
-import { db } from "~/server/db";
 import { auth } from "~/lib/auth";
+import { db } from "~/server/db";
 
 /**
  * 1. CONTEXT
@@ -25,11 +25,37 @@ import { auth } from "~/lib/auth";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
+export const createTRPCContext = async (opts: {
+  headers: Headers;
+  openapi?: boolean;
+}) => {
   // Get session from the headers
   const session = await auth.api.getSession({
     headers: opts.headers,
   });
+
+  if (opts.openapi && t._config.isDev) {
+    const [mockSession, mockUser] = await db.$transaction([
+      db.session.findFirst({
+        where: { userId: "user_admin_1" },
+      }),
+      db.user.findFirst({
+        where: { id: "user_admin_1" },
+      }),
+    ]);
+
+    console.log("mockSession", mockSession);
+    console.log("mockUser", mockUser);
+
+    return {
+      db,
+      session: {
+        session: mockSession!,
+        user: mockUser!,
+      } satisfies typeof session,
+      ...opts,
+    };
+  }
 
   return {
     db,
@@ -45,19 +71,22 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-const t = initTRPC.context<typeof createTRPCContext>().create({
-  transformer: superjson,
-  errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
-      },
-    };
-  },
-});
+const t = initTRPC
+  .context<typeof createTRPCContext>()
+  .meta<OpenApiMeta>()
+  .create({
+    transformer: superjson,
+    errorFormatter({ shape, error }) {
+      return {
+        ...shape,
+        data: {
+          ...shape.data,
+          zodError:
+            error.cause instanceof ZodError ? error.cause.flatten() : null,
+        },
+      };
+    },
+  });
 
 /**
  * Create a server-side caller.
