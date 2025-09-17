@@ -1,3 +1,10 @@
+
+https://github.com/user-attachments/assets/9a897fb8-f03b-41f4-9a0b-1a017d9767c7
+
+https://github.com/user-attachments/assets/9b67e0d3-d7ba-439d-9d23-fae80b485a7e
+
+<img width="4032" height="2302" alt="Screenshot 2025-09-17 at 17 20 51" src="https://github.com/user-attachments/assets/8c5c6a8b-1b00-4fd4-a9aa-30098b40ab06" />
+
 # Multi Tenant Clinic Appointment System
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app` for a medical appointment management system.
