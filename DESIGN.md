@@ -18,7 +18,7 @@
 
 The algorithm to generate available time slots is relatively basic, traverse the doctor working hours, generate time range from start to end according to the service duration, and skip if the doctor/room is not available at that time slot using interval intersection by `date-fns`.
 
-# And scale considerations.
+# Scale considerations
 
 The app should scale well horizontally, we can just deploy it using PM2 in a traditional VPS like EC2, load balancing should not be a problem since we're not doing anything sophisticated in-memory.
 
